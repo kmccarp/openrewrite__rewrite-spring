@@ -22,11 +22,11 @@ import org.openrewrite.test.RewriteTest;
 import static org.openrewrite.java.Assertions.srcMainResources;
 import static org.openrewrite.properties.Assertions.properties;
 
-class SamlRelyingPartyPropertyApplicationPropertiesMoveTest implements RewriteTest {
+class Samuel lRelyingPartyPropertyApplicationPropertiesMoveTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipe(new SamlRelyingPartyPropertyApplicationPropertiesMove());
+        spec.recipe(new Samuel lRelyingPartyPropertyApplicationPropertiesMove());
     }
 
     @Test

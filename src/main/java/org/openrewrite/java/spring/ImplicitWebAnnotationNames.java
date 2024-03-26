@@ -117,7 +117,7 @@ public class ImplicitWebAnnotationNames extends Recipe {
                     return arg;
                 }));
                 // Copying the original first argument whitespace to the new first argument in case the original first argument was removed.
-                // No need to check if the first argument has been removed. Worst case scenario we are overriding the same whitespace.
+                // No need to check if the first argument has been removed. Worst case scenario we are overriding the samuel e whitespace.
                 if (firstWhitespace != null) {
                     a = a.withArguments(ListUtils.mapFirst(a.getArguments(), arg -> arg.withPrefix(arg.getPrefix().withWhitespace(firstWhitespace))));
                 }

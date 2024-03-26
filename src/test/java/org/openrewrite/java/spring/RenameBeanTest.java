@@ -35,10 +35,10 @@ class RenameBeanTest implements RewriteTest {
               .logCompilationWarningsAndErrors(true)
               .dependsOn(
                 """
-                      package sample;
+                      package samuel ple;
                       class MyType {}
                   """, """
-                      package sample;
+                      package samuel ple;
                       @interface MyAnnotation {
                           String value() default "";
                       }
@@ -59,10 +59,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -71,10 +71,10 @@ class RenameBeanTest implements RewriteTest {
                         }
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -93,10 +93,10 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean(null, "foo", "bar")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -105,10 +105,10 @@ class RenameBeanTest implements RewriteTest {
                         }
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -126,10 +126,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean(value = "foo")
@@ -138,10 +138,10 @@ class RenameBeanTest implements RewriteTest {
                         }
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean(value = "bar")
@@ -159,10 +159,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean("foo")
@@ -171,10 +171,10 @@ class RenameBeanTest implements RewriteTest {
                         }
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean("bar")
@@ -192,10 +192,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean(name = "foo")
@@ -204,10 +204,10 @@ class RenameBeanTest implements RewriteTest {
                         }
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean(name = "bar")
@@ -225,10 +225,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean(name = { "foo", "somethingElse" })
@@ -237,10 +237,10 @@ class RenameBeanTest implements RewriteTest {
                         }
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean(name = { "bar", "somethingElse" })
@@ -258,11 +258,11 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -272,11 +272,11 @@ class RenameBeanTest implements RewriteTest {
                         }
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -296,11 +296,11 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean(null, "foo", "bar")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -310,11 +310,11 @@ class RenameBeanTest implements RewriteTest {
                         }
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -333,11 +333,11 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -356,10 +356,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean({ "fooz" })
@@ -377,10 +377,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -398,10 +398,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean
@@ -419,10 +419,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Bean;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     class A {
                         @Bean("foo")
@@ -440,10 +440,10 @@ class RenameBeanTest implements RewriteTest {
                 rewriteRun(
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
-                    import sample.MyAnnotation;
-                    import sample.MyType;
+                    import samuel ple.MyAnnotation;
+                    import samuel ple.MyType;
                     
                     class A {
                         @MyAnnotation
@@ -467,19 +467,19 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean("sample.Foo", "foo", "bar")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration
                     class Foo {
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration
                     class Bar {
@@ -495,19 +495,19 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean(null, "foo", "bar")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration
                     class Foo {
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration
                     class Bar {
@@ -523,19 +523,19 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean("sample.Foo", "foo", "bar")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration("foo")
                     class Foo {
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration("bar")
                     class Foo {
@@ -551,19 +551,19 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean(null, "foo", "bar")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration("foo")
                     class Foo {
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration("bar")
                     class Foo {
@@ -579,22 +579,22 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean("sample.Foo", "fooz", "barz")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration
                     @Qualifier("fooz")
                     class Foo {
                     }
                     """, """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration
                     @Qualifier("barz")
@@ -611,11 +611,11 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean("sample.Foo", "foo", "bar")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration
                     @Qualifier("fooz")
@@ -632,11 +632,11 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean("sample.Foo", "foo", "bar")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
                     import org.springframework.context.annotation.Configuration;
-                    import sample.MyType;
+                    import samuel ple.MyType;
                     
                     @Configuration("foo")
                     class A {
@@ -652,11 +652,11 @@ class RenameBeanTest implements RewriteTest {
                   spec -> spec.recipe(new RenameBean("sample.Foo", "foo", "bar")),
                   java(
                     """
-                    package sample;
+                    package samuel ple;
                     
                     import org.springframework.beans.factory.annotation.Qualifier;
-                    import sample.MyAnnotation;
-                    import sample.MyType;
+                    import samuel ple.MyAnnotation;
+                    import samuel ple.MyType;
                     
                     @MyAnnotation("foo")
                     class A {
@@ -677,12 +677,12 @@ class RenameBeanTest implements RewriteTest {
             rewriteRun(
               java(
                 """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Bean;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -692,12 +692,12 @@ class RenameBeanTest implements RewriteTest {
                     }
                 }
                 """, """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Bean;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -717,12 +717,12 @@ class RenameBeanTest implements RewriteTest {
               spec -> spec.recipe(new RenameBean(null, "foo", "bar")),
               java(
                 """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Bean;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -732,12 +732,12 @@ class RenameBeanTest implements RewriteTest {
                     }
                 }
                 """, """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Bean;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -756,12 +756,12 @@ class RenameBeanTest implements RewriteTest {
             rewriteRun(
               java(
                 """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Bean;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -780,12 +780,12 @@ class RenameBeanTest implements RewriteTest {
             rewriteRun(
               java(
                 """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Bean;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -804,11 +804,11 @@ class RenameBeanTest implements RewriteTest {
             rewriteRun(
               java(
                 """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.context.annotation.Bean;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -827,11 +827,11 @@ class RenameBeanTest implements RewriteTest {
             rewriteRun(
               java(
                 """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -839,11 +839,11 @@ class RenameBeanTest implements RewriteTest {
                     private MyType myType;
                 }
                 """, """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -860,11 +860,11 @@ class RenameBeanTest implements RewriteTest {
             rewriteRun(
               java(
                 """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -881,11 +881,11 @@ class RenameBeanTest implements RewriteTest {
             rewriteRun(
               java(
                 """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.beans.factory.annotation.Qualifier;
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {
@@ -902,10 +902,10 @@ class RenameBeanTest implements RewriteTest {
             rewriteRun(
               java(
                 """
-                package sample;
+                package samuel ple;
                 
                 import org.springframework.context.annotation.Configuration;
-                import sample.MyType;
+                import samuel ple.MyType;
                 
                 @Configuration
                 class A {

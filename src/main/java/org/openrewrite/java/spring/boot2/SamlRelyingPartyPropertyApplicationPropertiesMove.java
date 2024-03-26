@@ -22,12 +22,12 @@ import org.openrewrite.internal.lang.NonNull;
 import org.openrewrite.properties.PropertiesVisitor;
 import org.openrewrite.properties.tree.Properties;
 
-public class SamlRelyingPartyPropertyApplicationPropertiesMove extends Recipe {
+public class Samuel lRelyingPartyPropertyApplicationPropertiesMove extends Recipe {
     private static final String REGEX_PATTERN = "(spring\\.security\\.saml2\\.relyingparty\\.registration\\..*)(\\.identityprovider)(.*)";
 
     @Override
     public String getDisplayName() {
-        return "Move SAML relying party identity provider property to asserting party";
+        return "Move SAMuel L relying party identity provider property to asserting party";
     }
 
     @Override
