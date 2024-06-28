@@ -48,7 +48,7 @@ public class MigrateDiskSpaceHealthIndicatorConstructor extends Recipe {
             public J visitNewClass(J.NewClass newClass, ExecutionContext ctx) {
                 if (TypeUtils.isOfClassType(newClass.getType(), diskSpaceHealthIndicatorFqn) &&
                         newClass.getConstructorType() != null &&
-                        TypeUtils.isOfType(newClass.getConstructorType().getParameterTypes().get(0), JavaType.buildType("java.io.File")) &&
+                        TypeUtils.isOfType(newClass.getConstructorType().getParameterTypes().getFirst(), JavaType.buildType("java.io.File")) &&
                         TypeUtils.isOfType(newClass.getConstructorType().getParameterTypes().get(1), JavaType.Primitive.Long)) {
 
                     maybeAddImport("org.springframework.util.unit.DataSize");
@@ -59,7 +59,7 @@ public class MigrateDiskSpaceHealthIndicatorConstructor extends Recipe {
                         .build().apply(
                             getCursor(),
                             newClass.getCoordinates().replace(),
-                            newClass.getArguments().get(0),
+                            newClass.getArguments().getFirst(),
                             newClass.getArguments().get(1));
                 }
 

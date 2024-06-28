@@ -59,7 +59,7 @@ public class MigrateRestTemplateBuilderTimeoutByInt extends Recipe {
                                     .apply(
                                             getCursor(),
                                             m.getCoordinates().replaceArguments(),
-                                            m.getArguments().get(0));
+                                            m.getArguments().getFirst());
                             maybeAddImport("java.time.Duration");
                         }
                         return m;

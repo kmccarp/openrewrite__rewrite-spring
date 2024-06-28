@@ -44,12 +44,14 @@ public class AddRouteTrailingSlash extends Recipe {
 
     @Override
     public String getDescription() {
-        return "This is part of Spring MVC and WebFlux URL Matching Changes, as of Spring Framework 6.0, the trailing" +
-               " slash matching configuration option has been deprecated and its default value set to false. This " +
-               "means that previously, a controller `@GetMapping(\"/some/greeting\")` would match both `GET " +
-               "/some/greeting` and `GET /some/greeting/`, but it doesn't match `GET /some/greeting/` anymore by" +
-               " default and will result in an HTTP 404 error. This recipe is to add declaration of additional route" +
-               " explicitly on the controller handler (like `@GetMapping(\"/some/greeting\", \"/some/greeting/\")`.";
+        return """
+               This is part of Spring MVC and WebFlux URL Matching Changes, as of Spring Framework 6.0, the trailing\
+                slash matching configuration option has been deprecated and its default value set to false. This \
+               means that previously, a controller `@GetMapping("/some/greeting")` would match both `GET \
+               /some/greeting` and `GET /some/greeting/`, but it doesn't match `GET /some/greeting/` anymore by\
+                default and will result in an HTTP 404 error. This recipe is to add declaration of additional route\
+                explicitly on the controller handler (like `@GetMapping("/some/greeting", "/some/greeting/")`.\
+               """;
     }
 
     @Override
@@ -64,8 +66,8 @@ public class AddRouteTrailingSlash extends Recipe {
                     return anno;
                 }
 
-                if (anno.getArguments().size() == 1 && isStringLiteral(anno.getArguments().get(0))) {
-                    J.Literal str = (J.Literal) anno.getArguments().get(0);
+                if (anno.getArguments().size() == 1 && isStringLiteral(anno.getArguments().getFirst())) {
+                    J.Literal str = (J.Literal) anno.getArguments().getFirst();
                     if (shouldAddTrailingSlashArgument(str.getValue().toString())) {
                         J.Annotation replacement = JavaTemplate.builder("{#{any(String)}, #{any(String)}}")
                                 .build()
@@ -77,8 +79,7 @@ public class AddRouteTrailingSlash extends Recipe {
                 } else {
                     // replace value
                     J.Annotation replacement = anno.withArguments(ListUtils.map(anno.getArguments(), exp -> {
-                        if (exp instanceof J.Assignment) {
-                            J.Assignment assignment = (J.Assignment) exp;
+                        if (exp instanceof J.Assignment assignment) {
                             if (assignment.getVariable() instanceof J.Identifier &&
                                 ((J.Identifier) assignment.getVariable()).getSimpleName().equals("value") &&
                                 isStringLiteral(assignment.getAssignment())) {
@@ -90,7 +91,7 @@ public class AddRouteTrailingSlash extends Recipe {
                                             .build()
                                             .<J.Annotation>apply(getCursor(),
                                                     anno.getCoordinates().replaceArguments(),
-                                                    (Object[]) buildTwoStringsArray(str)).getArguments().get(0);
+                                                    (Object[]) buildTwoStringsArray(str)).getArguments().getFirst();
                                 }
                             }
                         }
@@ -132,6 +133,6 @@ public class AddRouteTrailingSlash extends Recipe {
 
 
     private static boolean isStringLiteral(Expression expression) {
-        return expression instanceof J.Literal && TypeUtils.isString(((J.Literal) expression).getType());
+        return expression instanceof J.Literal l && TypeUtils.isString(l.getType());
     }
 }

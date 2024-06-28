@@ -47,12 +47,14 @@ public class UpdateRequestCache extends Recipe {
 
     @Override
     public String getDescription() {
-        return "By default, Spring Security 5 queries the saved request on every request, which means that in a " +
-                "typical setup, the HttpSession is queried on every request to use the RequestCache. In Spring " +
-                "Security 6, the default behavior has changed, and RequestCache will only be queried for a cached " +
-                "request if the HTTP parameter \"continue\" is defined. To maintain the same default behavior as " +
-                "Spring Security 5, either explicitly add the HTTP parameter \"continue\" to every request or use " +
-                "NullRequestCache to override the default behavior.";
+        return """
+                By default, Spring Security 5 queries the saved request on every request, which means that in a \
+                typical setup, the HttpSession is queried on every request to use the RequestCache. In Spring \
+                Security 6, the default behavior has changed, and RequestCache will only be queried for a cached \
+                request if the HTTP parameter "continue" is defined. To maintain the same default behavior as \
+                Spring Security 5, either explicitly add the HTTP parameter "continue" to every request or use \
+                NullRequestCache to override the default behavior.\
+                """;
     }
 
     @Override
@@ -96,7 +98,7 @@ public class UpdateRequestCache extends Recipe {
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method,
                                                             ExecutionContext ctx) {
                 if (REQUEST_CACHE_MATCHER.matches(method)) {
-                    Expression arg = method.getArguments().get(0);
+                    Expression arg = method.getArguments().getFirst();
                     if (isNewHttpSessionRequestCacheExpression(arg)) {
                         JavaTemplate template = JavaTemplate.builder("new NullRequestCache()")
                                 .javaParser(JavaParser.fromJavaVersion()
@@ -121,14 +123,13 @@ public class UpdateRequestCache extends Recipe {
     }
 
     private static J.Identifier getSelect(Statement statement) {
-        return ((J.VariableDeclarations) statement).getVariables().get(0).getName();
+        return ((J.VariableDeclarations) statement).getVariables().getFirst().getName();
     }
 
     private static boolean isNewHttpSessionRequestCacheStatement(Statement statement) {
-        if (statement instanceof J.VariableDeclarations) {
-            J.VariableDeclarations mv = (J.VariableDeclarations) statement;
+        if (statement instanceof J.VariableDeclarations mv) {
             if (mv.getVariables().size() == 1) {
-                J.VariableDeclarations.NamedVariable v = mv.getVariables().get(0);
+                J.VariableDeclarations.NamedVariable v = mv.getVariables().getFirst();
                 return TypeUtils.isOfClassType(v.getType(),
                         "org.springframework.security.web.savedrequest.HttpSessionRequestCache") &&
                         v.getInitializer() != null && isNewHttpSessionRequestCacheExpression(v.getInitializer());
@@ -138,12 +139,11 @@ public class UpdateRequestCache extends Recipe {
     }
 
     private static boolean isContinueParameterStatement(Statement statement) {
-        if (statement instanceof J.MethodInvocation) {
-            J.MethodInvocation m = (J.MethodInvocation) statement;
+        if (statement instanceof J.MethodInvocation m) {
 
             if (CONTINUE_PARAMETER_MATCHER.matches(m)) {
-                if (m.getArguments().get(0) instanceof J.Literal) {
-                    return "continue".equals(((J.Literal) m.getArguments().get(0)).getValue());
+                if (m.getArguments().getFirst() instanceof J.Literal) {
+                    return "continue".equals(((J.Literal) m.getArguments().getFirst()).getValue());
                 }
             }
         }

@@ -48,7 +48,7 @@ public class SimplifyWebTestClientCalls extends Recipe {
             public MethodInvocation visitMethodInvocation(MethodInvocation method, ExecutionContext ctx) {
                 MethodInvocation m = super.visitMethodInvocation(method, ctx);
                 if (IS_EQUAL_TO_INT_MATCHER.matches(m.getMethodType())) {
-                    int statusCode = (int) ((Literal) m.getArguments().get(0)).getValue();
+                    int statusCode = (int) ((Literal) m.getArguments().getFirst()).getValue();
                     switch (statusCode) {
                         case 200:
                             return replaceMethod(m, "isOk()");

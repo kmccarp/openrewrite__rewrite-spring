@@ -136,22 +136,22 @@ public class RenameBean extends Recipe {
             if (anyAnnotationMatches(annotation, types)) {
                 if (annotation.getArguments() != null && !annotation.getArguments().isEmpty()) {
                     for (Expression expr : annotation.getArguments()) {
-                        if (expr instanceof J.Literal) {
-                            return new BeanSearchResult(true, (String) ((J.Literal) expr).getValue());
+                        if (expr instanceof J.Literal literal) {
+                            return new BeanSearchResult(true, (String) literal.getValue());
                         }
                         J.Assignment beanNameAssignment = asBeanNameAssignment(expr);
                         if (beanNameAssignment != null) {
                             Expression assignmentExpr = beanNameAssignment.getAssignment();
-                            if (assignmentExpr instanceof J.Literal) {
-                                return new BeanSearchResult(true, (String) ((J.Literal) assignmentExpr).getValue());
-                            } else if (assignmentExpr instanceof J.NewArray) {
-                                List<Expression> initializers = ((J.NewArray) assignmentExpr).getInitializer();
+                            if (assignmentExpr instanceof J.Literal literal) {
+                                return new BeanSearchResult(true, (String) literal.getValue());
+                            } else if (assignmentExpr instanceof J.NewArray array) {
+                                List<Expression> initializers = array.getInitializer();
                                 if (initializers != null) {
                                     for (Expression initExpr : initializers) {
                                         // if multiple aliases, just take the first one
-                                        if (initExpr instanceof J.Literal) {
+                                        if (initExpr instanceof J.Literal literal) {
                                             return new BeanSearchResult(true,
-                                                    (String) ((J.Literal) initExpr).getValue());
+                                                    (String) literal.getValue());
                                         }
                                     }
                                 }
@@ -244,8 +244,7 @@ public class RenameBean extends Recipe {
             }
 
             private void renameMatchingQualifierAnnotations(Statement statement) {
-                if (statement instanceof J.VariableDeclarations) {
-                    J.VariableDeclarations varDecls = (J.VariableDeclarations) statement;
+                if (statement instanceof J.VariableDeclarations varDecls) {
                     for (J.VariableDeclarations.NamedVariable namedVar : varDecls.getVariables()) {
                         if (isRelevantType(namedVar.getType())) {
                             maybeRenameBean(varDecls.getAllAnnotations(), JUST_QUALIFIER);
@@ -272,8 +271,8 @@ public class RenameBean extends Recipe {
                         beanAnnotation = annotation;
                         if (beanAnnotation.getArguments() != null && !beanAnnotation.getArguments().isEmpty()) {
                             for (Expression expr : beanAnnotation.getArguments()) {
-                                if (expr instanceof J.Literal) {
-                                    literalBeanName = (J.Literal) expr;
+                                if (expr instanceof J.Literal literal) {
+                                    literalBeanName = literal;
                                     break outer;
                                 }
                                 beanNameAssignment = asBeanNameAssignment(expr);
@@ -304,10 +303,10 @@ public class RenameBean extends Recipe {
 
     @Nullable
     private static J.Assignment asBeanNameAssignment(Expression argumentExpression) {
-        if (argumentExpression instanceof J.Assignment) {
-            Expression variable = ((J.Assignment) argumentExpression).getVariable();
-            if (variable instanceof J.Identifier) {
-                String variableName = ((J.Identifier) variable).getSimpleName();
+        if (argumentExpression instanceof J.Assignment assignment) {
+            Expression variable = assignment.getVariable();
+            if (variable instanceof J.Identifier identifier) {
+                String variableName = identifier.getSimpleName();
                 if (variableName.equals("name") || variableName.equals("value")) {
                     return (J.Assignment) argumentExpression;
                 }
@@ -350,13 +349,11 @@ public class RenameBean extends Recipe {
     }
 
     private Expression replace(Expression assignment, String oldName, String newName) {
-        if (assignment instanceof J.Literal) {
-            J.Literal literalAssignment = (J.Literal) assignment;
+        if (assignment instanceof J.Literal literalAssignment) {
             if (oldName.equals(literalAssignment.getValue())) {
                 return literalAssignment.withValue(newName).withValueSource("\"" + newName + "\"");
             }
-        } else if (assignment instanceof J.NewArray) {
-            J.NewArray newArrayAssignment = (J.NewArray) assignment;
+        } else if (assignment instanceof J.NewArray newArrayAssignment) {
             return newArrayAssignment.withInitializer(
                     ListUtils.map(newArrayAssignment.getInitializer(), expr -> replace(expr, oldName, newName)));
         }
@@ -364,10 +361,9 @@ public class RenameBean extends Recipe {
     }
 
     private static boolean contains(Expression assignment, String oldName) {
-        if (assignment instanceof J.Literal) {
-            return oldName.equals(((J.Literal) assignment).getValue());
-        } else if (assignment instanceof J.NewArray) {
-            J.NewArray newArrayAssignment = (J.NewArray) assignment;
+        if (assignment instanceof J.Literal literal) {
+            return oldName.equals(literal.getValue());
+        } else if (assignment instanceof J.NewArray newArrayAssignment) {
             if (newArrayAssignment.getInitializer() == null) {
                 return false;
             }

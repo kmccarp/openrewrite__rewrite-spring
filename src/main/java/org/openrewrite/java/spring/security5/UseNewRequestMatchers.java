@@ -48,9 +48,11 @@ public class UseNewRequestMatchers extends Recipe {
 
     @Override
     public String getDescription() {
-        return "In Spring Security 5.8, the `antMatchers`, `mvcMatchers`, and `regexMatchers` methods were deprecated " +
-                "in favor of new `requestMatchers` methods. Refer to the [Spring Security docs](https://docs.spring.io/spring-security/reference/5.8/migration/servlet/config.html#use-new-requestmatchers) " +
-                "for more information.";
+        return """
+                In Spring Security 5.8, the `antMatchers`, `mvcMatchers`, and `regexMatchers` methods were deprecated \
+                in favor of new `requestMatchers` methods. Refer to the [Spring Security docs](https://docs.spring.io/spring-security/reference/5.8/migration/servlet/config.html#use-new-requestmatchers) \
+                for more information.\
+                """;
     }
 
     @Override
@@ -68,7 +70,7 @@ public class UseNewRequestMatchers extends Recipe {
                                 && mi.getSelect() != null) {
                             String parametersTemplate = mi.getArguments().stream().map(arg -> "#{any()}").collect(joining(", "));
                             String replacementMethodName = isCsrfMatcher ? "ignoringRequestMatchers" : "requestMatchers";
-                            JavaTemplate template = JavaTemplate.builder(String.format(replacementMethodName + "(%s)", parametersTemplate))
+                            JavaTemplate template = JavaTemplate.builder((replacementMethodName + "(%s)").formatted(parametersTemplate))
                                     .javaParser(JavaParser.fromJavaVersion().classpathFromResources(ctx, "spring-security-config-5.8"))
                                     .build();
                             J.MethodInvocation apply = template.apply(getCursor(), mi.getCoordinates().replaceMethod(), mi.getArguments().toArray());

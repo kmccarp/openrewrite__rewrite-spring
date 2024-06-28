@@ -67,7 +67,7 @@ public class MigrateJobBuilderFactory extends Recipe {
                         .build().apply(
                             getCursor(),
                             method.getCoordinates().replace(),
-                            method.getArguments().get(0)
+                            method.getArguments().getFirst()
                         );
                 }
                 return super.visitMethodInvocation(method, ctx);
@@ -94,8 +94,8 @@ public class MigrateJobBuilderFactory extends Recipe {
                 return cd;
             }
             cd = cd.withBody(cd.getBody().withStatements(ListUtils.map(cd.getBody().getStatements(), statement -> {
-                if (statement instanceof J.VariableDeclarations && ((J.VariableDeclarations) statement).getTypeExpression() != null) {
-                    if (TypeUtils.isOfClassType(((J.VariableDeclarations) statement).getTypeExpression().getType(),
+                if (statement instanceof J.VariableDeclarations declarations && declarations.getTypeExpression() != null) {
+                    if (TypeUtils.isOfClassType(declarations.getTypeExpression().getType(),
                             "org.springframework.batch.core.configuration.annotation.JobBuilderFactory")) {
                         return null;
                     }
@@ -146,14 +146,14 @@ public class MigrateJobBuilderFactory extends Recipe {
         }
 
         private boolean isJobRepositoryParameter(Statement statement) {
-            return statement instanceof J.VariableDeclarations
-                    && TypeUtils.isOfClassType(((J.VariableDeclarations) statement).getType(),
+            return statement instanceof J.VariableDeclarations vd
+                    && TypeUtils.isOfClassType(vd.getType(),
                     "org.springframework.batch.core.repository.JobRepository");
         }
 
         private boolean isJobBuilderFactoryParameter(Statement statement) {
-            return statement instanceof J.VariableDeclarations
-                    && TypeUtils.isOfClassType(((J.VariableDeclarations) statement).getType(),
+            return statement instanceof J.VariableDeclarations vd
+                    && TypeUtils.isOfClassType(vd.getType(),
                     "org.springframework.batch.core.configuration.annotation.JobBuilderFactory");
         }
     }

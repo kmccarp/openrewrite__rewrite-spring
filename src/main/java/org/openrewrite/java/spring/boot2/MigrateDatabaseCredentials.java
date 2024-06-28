@@ -44,10 +44,12 @@ public class MigrateDatabaseCredentials extends Recipe {
 
     @Override
     public String getDescription() {
-        return "If you currently define a `spring.flyway.url` or `spring.liquibase.url` you may need to provide " +
-                "additional username and password properties. In earlier versions of Spring Boot, these settings were " +
-                "derived from `spring.datasource` properties but this turned out to be problematic for people that " +
-                "provided their own `DataSource` beans.";
+        return """
+                If you currently define a `spring.flyway.url` or `spring.liquibase.url` you may need to provide \
+                additional username and password properties. In earlier versions of Spring Boot, these settings were \
+                derived from `spring.datasource` properties but this turned out to be problematic for people that \
+                provided their own `DataSource` beans.\
+                """;
     }
 
     @Override

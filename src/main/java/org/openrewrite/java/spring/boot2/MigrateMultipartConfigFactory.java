@@ -61,7 +61,7 @@ public class MigrateMultipartConfigFactory extends Recipe {
                                             .build().apply(
                                     getCursor(),
                                     m.getCoordinates().replaceArguments(),
-                                    m.getArguments().get(0));
+                                    m.getArguments().getFirst());
                         } else if (setMaxFileSizeByString.matches(m) || setMaxRequestSizeByString.matches(m) || setFileSizeThresholdByString.matches(m)) {
                             m = JavaTemplate
                                 .builder("DataSize.parse(#{any(java.lang.String)})")
@@ -71,7 +71,7 @@ public class MigrateMultipartConfigFactory extends Recipe {
                                 .build().apply(
                                     getCursor(),
                                     m.getCoordinates().replaceArguments(),
-                                    m.getArguments().get(0));
+                                    m.getArguments().getFirst());
                         }
                         maybeAddImport("org.springframework.util.unit.DataSize");
                         return m;

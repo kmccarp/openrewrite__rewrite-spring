@@ -50,8 +50,10 @@ public class ReplaceDeprecatedEnvironmentTestUtils extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Replaces any references to the deprecated `EnvironmentTestUtils`" +
-                " with `TestPropertyValues` and the appropriate functionality.";
+        return """
+                Replaces any references to the deprecated `EnvironmentTestUtils`\
+                 with `TestPropertyValues` and the appropriate functionality.\
+                """;
     }
 
     @Override
@@ -106,8 +108,7 @@ public class ReplaceDeprecatedEnvironmentTestUtils extends Recipe {
             boolean requiresRemoval = false;
 
             for (Statement statement : statements) {
-                if (statement instanceof J.MethodInvocation && isAddEnvironmentMethod((J.MethodInvocation) statement)) {
-                    J.MethodInvocation methodInvocation = (J.MethodInvocation) statement;
+                if (statement instanceof J.MethodInvocation methodInvocation && isAddEnvironmentMethod(methodInvocation)) {
                     if (collectedEnvironmentMethods.isEmpty() || isCollectedContextOrEnvironment(collectedEnvironmentMethods, methodInvocation)) {
                         collectedEnvironmentMethods.add(methodInvocation);
                         requiresRemoval = true;
@@ -139,10 +140,10 @@ public class ReplaceDeprecatedEnvironmentTestUtils extends Recipe {
         private boolean isCollectedContextOrEnvironment(List<J.MethodInvocation> collectedMethods, J.MethodInvocation methodInvocation) {
             if (methodInvocation.getArguments().isEmpty()
                     || collectedMethods.isEmpty()
-                    || collectedMethods.get(0).getArguments().isEmpty()) {
+                    || collectedMethods.getFirst().getArguments().isEmpty()) {
                 return false;
             }
-            J.MethodInvocation collectedMethod = collectedMethods.get(0);
+            J.MethodInvocation collectedMethod = collectedMethods.getFirst();
             Expression contextOrEnvironmentToCheck = getContextOrEnvironmentArgument(methodInvocation);
             Expression collectedContextOrEnvironment = getContextOrEnvironmentArgument(collectedMethod);
 
@@ -161,7 +162,7 @@ public class ReplaceDeprecatedEnvironmentTestUtils extends Recipe {
             if (methodInvocation.getArguments().size() < MINIMUM_ARGUMENT_COUNT_WITH_NAME) {
                 return null;
             }
-            Expression firstArgument = methodInvocation.getArguments().get(0);
+            Expression firstArgument = methodInvocation.getArguments().getFirst();
 
             if (firstArgument.getType() != null && firstArgument.getType().equals(JavaType.Primitive.String)) {
                 return firstArgument;
@@ -192,7 +193,7 @@ public class ReplaceDeprecatedEnvironmentTestUtils extends Recipe {
             if (collectedMethods.isEmpty()) {
                 throw new IllegalArgumentException("collectedMethods must have at least one element");
             }
-            J.MethodInvocation toReplace = collectedMethods.get(0);
+            J.MethodInvocation toReplace = collectedMethods.getFirst();
 
             String currentTemplateString = generateTemplateString(collectedMethods);
             List<Expression> parameters = generateParameters(collectedMethods);
@@ -208,10 +209,10 @@ public class ReplaceDeprecatedEnvironmentTestUtils extends Recipe {
             for (J.MethodInvocation collectedMethod : collectedMethods) {
                 parameters.addAll(getPairArguments(collectedMethod));
             }
-            parameters.add(getContextOrEnvironmentArgument(collectedMethods.get(0)));
+            parameters.add(getContextOrEnvironmentArgument(collectedMethods.getFirst()));
 
-            if (isNamedEnvironmentMethod(collectedMethods.get(0))) {
-                parameters.add(collectedMethods.get(0).getArguments().get(0));
+            if (isNamedEnvironmentMethod(collectedMethods.getFirst())) {
+                parameters.add(collectedMethods.getFirst().getArguments().getFirst());
             }
 
             return parameters;
@@ -226,7 +227,7 @@ public class ReplaceDeprecatedEnvironmentTestUtils extends Recipe {
                     appendOf = false;
                 }
             }
-            if (isNamedEnvironmentMethod(collectedMethods.get(0))) {
+            if (isNamedEnvironmentMethod(collectedMethods.getFirst())) {
                 template.append(".applyTo(#{any()}, TestPropertyValues.Type.MAP, #{any()})");
             } else {
                 template.append(".applyTo(#{any()})");

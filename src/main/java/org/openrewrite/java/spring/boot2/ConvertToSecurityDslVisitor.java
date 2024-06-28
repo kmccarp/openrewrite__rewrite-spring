@@ -91,7 +91,7 @@ public class ConvertToSecurityDslVisitor<P> extends JavaIsoVisitor<P> {
                                 .withMethodType(newMethodType)
                                 .withName(m.getName().withSimpleName(newMethodType.getName()))
                                 .withArguments(ListUtils.concat(
-                                                keepArg ? m.getArguments().get(0) : null,
+                                                keepArg ? m.getArguments().getFirst() : null,
                                                 Collections.singletonList(chain.isEmpty() ?
                                                         createDefaultsCall() :
                                                         createLambdaParam(paramName, newMethodType.getParameterTypes().get(keepArg ? 1 : 0), chain))
@@ -171,7 +171,7 @@ public class ConvertToSecurityDslVisitor<P> extends JavaIsoVisitor<P> {
         return argReplacements.containsKey(m.getSimpleName())
                 && m.getMethodType() != null
                 && m.getMethodType().getParameterTypes().size() == 1
-                && !TypeUtils.isAssignableTo(FQN_CUSTOMIZER, m.getMethodType().getParameterTypes().get(0));
+                && !TypeUtils.isAssignableTo(FQN_CUSTOMIZER, m.getMethodType().getParameterTypes().getFirst());
     }
 
     private Optional<JavaType.Method> createDesiredReplacement(J.MethodInvocation m) {
@@ -259,7 +259,7 @@ public class ConvertToSecurityDslVisitor<P> extends JavaIsoVisitor<P> {
         }
         if (!(cursor.getValue() instanceof J.MethodInvocation)) {
             // top invocation is at the end of the chain - mark it. We'd need to strip off prefix from this invocation later
-            J.MethodInvocation topInvocation = chain.remove(chain.size() - 1);
+            J.MethodInvocation topInvocation = chain.removeLast();
             // removed above, now add it back with the marker
             chain.add(topInvocation.withMarkers(topInvocation.getMarkers().addIfAbsent(new Markup.Info(Tree.randomId(), MSG_TOP_INVOCATION, null))));
         }
@@ -268,7 +268,7 @@ public class ConvertToSecurityDslVisitor<P> extends JavaIsoVisitor<P> {
 
     private boolean isAndMethod(J.MethodInvocation method) {
         return "and".equals(method.getSimpleName()) &&
-                (method.getArguments().isEmpty() || method.getArguments().get(0) instanceof J.Empty) &&
+                (method.getArguments().isEmpty() || method.getArguments().getFirst() instanceof J.Empty) &&
                 TypeUtils.isAssignableTo(securityFqn, method.getType());
     }
 

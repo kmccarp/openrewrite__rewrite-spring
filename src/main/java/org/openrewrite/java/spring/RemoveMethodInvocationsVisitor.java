@@ -131,7 +131,7 @@ public class RemoveMethodInvocationsVisitor extends JavaVisitor<ExecutionContext
 
     private boolean isLambdaBody() {
         Object parent = getCursor().getParent().getValue();
-        return parent instanceof J.Lambda && ((J.Lambda) parent).getBody() == getCursor().getValue();
+        return parent instanceof J.Lambda l && l.getBody() == getCursor().getValue();
     }
 
     private boolean inMethodCallChain() {
@@ -160,20 +160,20 @@ public class RemoveMethodInvocationsVisitor extends JavaVisitor<ExecutionContext
                 }
                 return right;
             }
-        }.reduce(method, new ArrayList<>()).get(0);
+        }.reduce(method, new ArrayList<>()).getFirst();
     }
 
     public static Predicate<List<Expression>> isTrueArgument() {
         return args -> (args != null &&
                         args.size() == 1 &&
-                        isTrue(args.get(0))
+                        isTrue(args.getFirst())
         );
     }
 
     public static Predicate<List<Expression>> isFalseArgument() {
         return args -> (args != null &&
                         args.size() == 1 &&
-                        isFalse(args.get(0))
+                        isFalse(args.getFirst())
         );
     }
 
@@ -186,8 +186,8 @@ public class RemoveMethodInvocationsVisitor extends JavaVisitor<ExecutionContext
     }
 
     private static boolean isBoolean(Expression expression, Boolean b) {
-        if (expression instanceof J.Literal) {
-            return expression.getType() == JavaType.Primitive.Boolean && b.equals(((J.Literal) expression).getValue());
+        if (expression instanceof J.Literal literal) {
+            return expression.getType() == JavaType.Primitive.Boolean && b.equals(literal.getValue());
         }
         return false;
     }
@@ -196,12 +196,12 @@ public class RemoveMethodInvocationsVisitor extends JavaVisitor<ExecutionContext
     public J.Lambda visitLambda(J.Lambda lambda, ExecutionContext ctx) {
         lambda = (J.Lambda) super.visitLambda(lambda, ctx);
         J body = lambda.getBody();
-        if (body instanceof J.MethodInvocation && ToBeRemoved.hasMarker(body)) {
-            Expression select = ((J.MethodInvocation) body).getSelect();
+        if (body instanceof J.MethodInvocation invocation && ToBeRemoved.hasMarker(body)) {
+            Expression select = invocation.getSelect();
             List<J> parameters = lambda.getParameters().getParameters();
-            if (select instanceof J.Identifier && !parameters.isEmpty() && parameters.get(0) instanceof J.VariableDeclarations) {
-                J.VariableDeclarations declarations = (J.VariableDeclarations) parameters.get(0);
-                if (((J.Identifier) select).getSimpleName().equals(declarations.getVariables().get(0).getSimpleName())) {
+            if (select instanceof J.Identifier identifier && !parameters.isEmpty() && parameters.getFirst() instanceof J.VariableDeclarations) {
+                J.VariableDeclarations declarations = (J.VariableDeclarations) parameters.getFirst();
+                if (identifier.getSimpleName().equals(declarations.getVariables().getFirst().getSimpleName())) {
                     return ToBeRemoved.withMarker(lambda);
                 }
             } else if (select instanceof J.MethodInvocation) {
@@ -230,8 +230,8 @@ public class RemoveMethodInvocationsVisitor extends JavaVisitor<ExecutionContext
         if (statements.stream().anyMatch(ToBeRemoved::hasMarker)) {
             //noinspection DataFlowIssue
             return block.withStatements(statements.stream()
-                .filter(s -> !ToBeRemoved.hasMarker(s) || s instanceof J.MethodInvocation && ((J.MethodInvocation) s).getSelect() instanceof J.MethodInvocation)
-                .map(s -> s instanceof J.MethodInvocation && ToBeRemoved.hasMarker(s) ? ((J.MethodInvocation) s).getSelect().withPrefix(s.getPrefix()) : s)
+                .filter(s -> !ToBeRemoved.hasMarker(s) || s instanceof J.MethodInvocation mi && mi.getSelect() instanceof J.MethodInvocation)
+                .map(s -> s instanceof J.MethodInvocation mi && ToBeRemoved.hasMarker(s) ? mi.getSelect().withPrefix(s.getPrefix()) : s)
                 .collect(Collectors.toList()));
         }
         return block;

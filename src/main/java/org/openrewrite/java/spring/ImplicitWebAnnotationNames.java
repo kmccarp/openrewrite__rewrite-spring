@@ -72,7 +72,7 @@ public class ImplicitWebAnnotationNames extends Recipe {
             if (!varDecls.getLeadingAnnotations().isEmpty()) {
                 if (varDecls.getTypeExpression() != null && varDecls.getTypeExpression().getPrefix().getWhitespace().isEmpty()) {
                     List<J.Annotation> annotations = varDecls.getLeadingAnnotations();
-                    J.Annotation lastAnnotation = annotations.get(annotations.size() - 1);
+                    J.Annotation lastAnnotation = annotations.getLast();
                     if (lastAnnotation.getArguments() == null || lastAnnotation.getArguments().isEmpty()) {
                         varDecls = varDecls.withTypeExpression(
                                 varDecls.getTypeExpression().withPrefix(
@@ -92,14 +92,13 @@ public class ImplicitWebAnnotationNames extends Recipe {
 
                 // Copying the first argument whitespace to use it later on in case we remove the original first argument.
                 String firstWhitespace = a.getArguments() != null && !a.getArguments().isEmpty() ?
-                        a.getArguments().get(0).getPrefix().getWhitespace() :
+                        a.getArguments().getFirst().getPrefix().getWhitespace() :
                         null;
 
                 a = a.withArguments(ListUtils.map(a.getArguments(), arg -> {
                     Cursor varDecsCursor = getCursor().getParentOrThrow();
-                    J.VariableDeclarations.NamedVariable namedVariable = varDecsCursor.<J.VariableDeclarations>getValue().getVariables().get(0);
-                    if (arg instanceof J.Assignment) {
-                        J.Assignment assignment = (J.Assignment) arg;
+                    J.VariableDeclarations.NamedVariable namedVariable = varDecsCursor.<J.VariableDeclarations>getValue().getVariables().getFirst();
+                    if (arg instanceof J.Assignment assignment) {
                         if (assignment.getVariable() instanceof J.Identifier && assignment.getAssignment() instanceof J.Literal) {
                             J.Identifier assignName = (J.Identifier) assignment.getVariable();
                             if ("value".equals(assignName.getSimpleName()) || "name".equals(assignName.getSimpleName())) {
@@ -108,8 +107,8 @@ public class ImplicitWebAnnotationNames extends Recipe {
                                 }
                             }
                         }
-                    } else if (arg instanceof J.Literal) {
-                        if (maybeRemoveArg(namedVariable, (J.Literal) arg)) {
+                    } else if (arg instanceof J.Literal literal) {
+                        if (maybeRemoveArg(namedVariable, literal)) {
                             return null;
                         }
                     }

@@ -44,8 +44,10 @@ public class UseSha256InRememberMe extends Recipe {
 
     @Override
     public String getDescription() {
-        return "As of Spring Security 6.0 the SHA-256 algorithm is the default for the encoding and matching algorithm used by `TokenBasedRememberMeServices` and does thus no longer need to be explicitly configured. "
-                + "See the corresponding [Sprint Security 6.0 migration step](https://docs.spring.io/spring-security/reference/6.0.0/migration/servlet/authentication.html#servlet-opt-in-sha256-rememberme) for details.";
+        return """
+                As of Spring Security 6.0 the SHA-256 algorithm is the default for the encoding and matching algorithm used by `TokenBasedRememberMeServices` and does thus no longer need to be explicitly configured. \
+                See the corresponding [Sprint Security 6.0 migration step](https://docs.spring.io/spring-security/reference/6.0.0/migration/servlet/authentication.html#servlet-opt-in-sha256-rememberme) for details.\
+                """;
     }
 
     @Override
@@ -68,7 +70,7 @@ public class UseSha256InRememberMe extends Recipe {
                 method = super.visitMethodInvocation(method, ctx);
                 if (method.getSelect() != null && method.getArguments().size() == 1
                         && REMEMBER_ME_SERVICES_SET_MATCHING_ALGORITHM_MATCHER.matches(method)) {
-                    if (isSha256Algorithm(method.getArguments().get(0), getCursor())) {
+                    if (isSha256Algorithm(method.getArguments().getFirst(), getCursor())) {
                         return null;
                     }
                 }
@@ -80,10 +82,10 @@ public class UseSha256InRememberMe extends Recipe {
     private boolean isSha256Algorithm(Expression expression, Cursor cursor) {
         Expression resolvedExpression = LocalVariableUtils.resolveExpression(expression, cursor);
         JavaType.Variable fieldType = null;
-        if (resolvedExpression instanceof J.Identifier) {
-            fieldType = ((J.Identifier) resolvedExpression).getFieldType();
-        } else if (resolvedExpression instanceof J.FieldAccess) {
-            fieldType = ((J.FieldAccess) resolvedExpression).getName().getFieldType();
+        if (resolvedExpression instanceof J.Identifier identifier) {
+            fieldType = identifier.getFieldType();
+        } else if (resolvedExpression instanceof J.FieldAccess access) {
+            fieldType = access.getName().getFieldType();
         }
 
         return fieldType != null && "SHA256".equals(fieldType.getName()) && TypeUtils.isOfType(fieldType.getType(), REMEMBER_ME_TOKEN_ALGORITHM_TYPE);

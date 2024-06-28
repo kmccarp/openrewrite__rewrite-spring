@@ -58,12 +58,11 @@ public class SimplifyMediaTypeParseCalls extends Recipe {
             J j = super.visitMethodInvocation(methodInvocation, ctx);
             J.MethodInvocation mi = (J.MethodInvocation) j;
             if (new MethodMatcher(PARSE_MEDIA_TYPE).matches(mi) || new MethodMatcher(VALUE_OF).matches(mi)) {
-                Expression methodArg = mi.getArguments().get(0);
-                if (methodArg instanceof J.FieldAccess
-                        && TypeUtils.isOfClassType(((J.FieldAccess) methodArg).getTarget().getType(), MEDIA_TYPE)) {
+                Expression methodArg = mi.getArguments().getFirst();
+                if (methodArg instanceof J.FieldAccess fieldAccess
+                        && TypeUtils.isOfClassType(fieldAccess.getTarget().getType(), MEDIA_TYPE)) {
                     maybeRemoveImport(MEDIA_TYPE + ".parseMediaType");
                     maybeRemoveImport(MEDIA_TYPE + ".valueOf");
-                    J.FieldAccess fieldAccess = (J.FieldAccess) methodArg;
                     String replacementConstant = fieldAccess.getSimpleName().replace("_VALUE", "");
                     Optional<JavaType.Variable> first = fieldAccess.getName().getFieldType() != null ?
                             ((JavaType.Class) fieldAccess.getName().getFieldType().getOwner()).getMembers().stream().filter(v -> v.getName().equals(replacementConstant)).findFirst() :

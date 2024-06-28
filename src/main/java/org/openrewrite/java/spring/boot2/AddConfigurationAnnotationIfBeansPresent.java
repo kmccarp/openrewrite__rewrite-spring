@@ -106,8 +106,8 @@ public class AddConfigurationAnnotationIfBeansPresent extends Recipe {
         }
         // No '@Configuration' present. Check if any methods have '@Bean' annotation
         for (Statement s : classDecl.getBody().getStatements()) {
-            if (s instanceof J.MethodDeclaration) {
-                if (isBeanMethod((J.MethodDeclaration) s)) {
+            if (s instanceof J.MethodDeclaration declaration) {
+                if (isBeanMethod(declaration)) {
                     return true;
                 }
             }

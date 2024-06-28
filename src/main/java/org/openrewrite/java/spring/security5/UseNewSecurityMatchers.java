@@ -43,9 +43,11 @@ public class UseNewSecurityMatchers extends Recipe {
 
     @Override
     public String getDescription() {
-        return "In Spring Security 5.8, the `HttpSecurity#antMatcher()`, `HttpSecurity#mvcMatcher()`, and `HttpSecurity#regexMatcher()` methods were deprecated " +
-                "in favor of new `HttpSecurity#securityMatcher()` method. Refer to the [Spring Security docs](https://docs.spring.io/spring-security/reference/5.8/migration/servlet/config.html#use-new-security-matchers) " +
-                "for more information.";
+        return """
+                In Spring Security 5.8, the `HttpSecurity#antMatcher()`, `HttpSecurity#mvcMatcher()`, and `HttpSecurity#regexMatcher()` methods were deprecated \
+                in favor of new `HttpSecurity#securityMatcher()` method. Refer to the [Spring Security docs](https://docs.spring.io/spring-security/reference/5.8/migration/servlet/config.html#use-new-security-matchers) \
+                for more information.\
+                """;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class UseNewSecurityMatchers extends Recipe {
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
                 J.MethodInvocation mi = super.visitMethodInvocation(method, ctx);
                 if (HTTP_SECURITY_MATCHER.matches(mi) && mi.getMethodType() != null) {
-                    return securityMatcherTemplate(ctx).apply(getCursor(), mi.getCoordinates().replaceMethod(), mi.getArguments().get(0));
+                    return securityMatcherTemplate(ctx).apply(getCursor(), mi.getCoordinates().replaceMethod(), mi.getArguments().getFirst());
                 }
                 return mi;
             }

@@ -56,9 +56,9 @@ public class FindApiCalls extends Recipe {
                 J.MethodInvocation m = super.visitMethodInvocation(method, ctx);
                 if (restTemplateCall.matches(method)) {
                     String httpMethod = method.getSimpleName().substring(0, method.getSimpleName().indexOf("For")).toUpperCase();
-                    Expression uri = method.getArguments().get(0);
-                    String uriValue = uri instanceof J.Literal ?
-                            String.valueOf(((J.Literal) uri).getValue()) :
+                    Expression uri = method.getArguments().getFirst();
+                    String uriValue = uri instanceof J.Literal l ?
+                            String.valueOf(l.getValue()) :
                             uri.printTrimmed(getCursor());
                     m = SearchResult.found(m, httpMethod + " " + uriValue);
                     calls.insertRow(ctx, new ApiCalls.Row(

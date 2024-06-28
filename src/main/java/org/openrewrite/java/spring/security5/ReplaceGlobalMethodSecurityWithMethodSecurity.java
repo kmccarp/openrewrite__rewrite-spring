@@ -45,9 +45,11 @@ public class ReplaceGlobalMethodSecurityWithMethodSecurity extends Recipe {
 
     @Override
     public String getDescription() {
-        return "`@EnableGlobalMethodSecurity` and `<global-method-security>` are deprecated in favor of " +
-               "`@EnableMethodSecurity` and `<method-security>`, respectively. The new annotation and XML " +
-               "element activate Spring’s pre-post annotations by default and use AuthorizationManager internally.";
+        return """
+               `@EnableGlobalMethodSecurity` and `<global-method-security>` are deprecated in favor of \
+               `@EnableMethodSecurity` and `<method-security>`, respectively. The new annotation and XML \
+               element activate Spring’s pre-post annotations by default and use AuthorizationManager internally.\
+               """;
     }
 
     @Override
@@ -75,7 +77,7 @@ public class ReplaceGlobalMethodSecurityWithMethodSecurity extends Recipe {
 
                             List<Expression> newArgs = oldArgs;
                             if (oldArgs.stream().noneMatch(this::hasPrePostEnabled)) {
-                                newArgs.add(replacementAnnotation.getArguments().get(0));
+                                newArgs.add(replacementAnnotation.getArguments().getFirst());
                             } else {
                                 newArgs = oldArgs.stream().filter(arg -> !hasPrePostEnabled(arg)).collect(Collectors.toList());
                             }
@@ -85,8 +87,7 @@ public class ReplaceGlobalMethodSecurityWithMethodSecurity extends Recipe {
                     }
 
                     private boolean hasPrePostEnabled(Expression arg) {
-                        if (arg instanceof J.Assignment) {
-                            J.Assignment assignment = (J.Assignment) arg;
+                        if (arg instanceof J.Assignment assignment) {
                             return ((J.Identifier) assignment.getVariable()).getSimpleName().equals("prePostEnabled") &&
                                    RemoveMethodInvocationsVisitor.isTrue(assignment.getAssignment());
                         }

@@ -71,8 +71,7 @@ public class AuthorizeHttpRequests extends Recipe {
             @Override
             public J visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
                 J visited = super.visitMethodInvocation(method, ctx);
-                if (visited instanceof J.MethodInvocation) {
-                    J.MethodInvocation m = (J.MethodInvocation) visited;
+                if (visited instanceof J.MethodInvocation m) {
                     JavaType.Method methodType = method.getMethodType();
                     if (methodType != null) {
                         if (MATCH_AUTHORIZE_REQUESTS.matches(methodType)) {
@@ -120,7 +119,7 @@ public class AuthorizeHttpRequests extends Recipe {
                 Cursor parentInvocationCursor = getCursor().getParent(2);
                 if (parentInvocationCursor == null || !(parentInvocationCursor.getValue() instanceof J.MethodInvocation)) {
                     // top level method invocation
-                    newComments.add(new TextComment(true, commentText.toString(), newComments.isEmpty() ? "\n" + m.getPrefix().getIndent() : newComments.get(0).getSuffix(), Markers.EMPTY));
+                    newComments.add(new TextComment(true, commentText.toString(), newComments.isEmpty() ? "\n" + m.getPrefix().getIndent() : newComments.getFirst().getSuffix(), Markers.EMPTY));
                     selectExpr = selectExpr.withPrefix(m.getPrefix());
                 } else {
                     // parent is method invocation
@@ -133,7 +132,7 @@ public class AuthorizeHttpRequests extends Recipe {
                 J.MethodInvocation.Padding padding = m.getPadding();
                 Space afterSelect = padding.getSelect().getAfter();
                 List<Comment> newComments = new ArrayList<>(afterSelect.getComments());
-                newComments.add(new TextComment(true, s, newComments.isEmpty() ? "\n" + afterSelect.getIndent() : newComments.get(0).getSuffix(), Markers.EMPTY));
+                newComments.add(new TextComment(true, s, newComments.isEmpty() ? "\n" + afterSelect.getIndent() : newComments.getFirst().getSuffix(), Markers.EMPTY));
                 JRightPadded<Expression> paddedSelect = padding.getSelect().withAfter(afterSelect.withComments(newComments));
                 return new J.MethodInvocation(m.getId(), m.getPrefix(), m.getMarkers(), paddedSelect, padding.getTypeParameters(), m.getName(), padding.getArguments(), m.getMethodType());
             }

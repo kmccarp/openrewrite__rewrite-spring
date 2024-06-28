@@ -81,8 +81,8 @@ public class ReplaceStringLiteralsWithHttpHeadersConstants extends ScanningRecip
         return new TreeVisitor<Tree, ExecutionContext>() {
             @Override
             public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
-                if (!acc.get() && tree instanceof SourceFile) {
-                    acc.set(declaresSpringWebDependency((SourceFile) tree, ctx));
+                if (!acc.get() && tree instanceof SourceFile file) {
+                    acc.set(declaresSpringWebDependency(file, ctx));
                 }
                 return tree;
             }

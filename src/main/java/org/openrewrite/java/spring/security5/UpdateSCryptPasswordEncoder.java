@@ -63,8 +63,10 @@ public class UpdateSCryptPasswordEncoder extends Recipe {
 
     @Override
     public String getDescription() {
-        return "In Spring Security 5.8 some `SCryptPasswordEncoder` constructors have been deprecated in favor of factory methods. "
-                + "Refer to the [ Spring Security migration docs](https://docs.spring.io/spring-security/reference/5.8/migration/index.html#_update_scryptpasswordencoder) for more information.";
+        return """
+                In Spring Security 5.8 some `SCryptPasswordEncoder` constructors have been deprecated in favor of factory methods. \
+                Refer to the [ Spring Security migration docs](https://docs.spring.io/spring-security/reference/5.8/migration/index.html#_update_scryptpasswordencoder) for more information.\
+                """;
     }
 
     @Override
@@ -74,15 +76,15 @@ public class UpdateSCryptPasswordEncoder extends Recipe {
             @Override
             public J visitNewClass(J.NewClass newClass, ExecutionContext ctx) {
                 J j = super.visitNewClass(newClass, ctx);
-                if (j instanceof J.NewClass && TypeUtils.isOfClassType(((J.NewClass) j).getType(), SCRYPT_PASSWORD_ENCODER_CLASS)) {
-                    newClass = (J.NewClass) j;
+                if (j instanceof J.NewClass class1 && TypeUtils.isOfClassType(class1.getType(), SCRYPT_PASSWORD_ENCODER_CLASS)) {
+                    newClass = class1;
                     if (DEFAULT_CONSTRUCTOR_MATCHER.matches(newClass)) {
                         maybeAddImport(SCRYPT_PASSWORD_ENCODER_CLASS);
                         return newV41FactoryMethodTemplate(ctx).apply(getCursor(), newClass.getCoordinates().replace());
                     } else {
                         List<Expression> arguments = newClass.getArguments();
                         if (FULL_CONSTRUCTOR_MATCHER.matches(newClass)) {
-                            Expression cpuCost = arguments.get(0);
+                            Expression cpuCost = arguments.getFirst();
                             Expression memoryCost = arguments.get(1);
                             Expression parallelization = arguments.get(2);
                             Expression keyLength = arguments.get(3);
@@ -109,7 +111,7 @@ public class UpdateSCryptPasswordEncoder extends Recipe {
 
             boolean resolvedValueMatchesLiteral(Expression expression, Object value) {
                 Expression resolvedExpression = resolveExpression(expression, getCursor());
-                return resolvedExpression instanceof J.Literal && Objects.equals(((J.Literal) resolvedExpression).getValue(), value);
+                return resolvedExpression instanceof J.Literal l && Objects.equals(l.getValue(), value);
             }
 
             private JavaTemplate newV41FactoryMethodTemplate(ExecutionContext ctx) {

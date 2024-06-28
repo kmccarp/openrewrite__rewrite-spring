@@ -68,7 +68,7 @@ public class RemoveConstructorBindingAnnotation extends Recipe {
                         .collect(Collectors.toList());
 
                 if (constructors.size() == 1) {
-                    Optional<J.Annotation> bindingAnnotation = constructors.get(0).getLeadingAnnotations().stream()
+                    Optional<J.Annotation> bindingAnnotation = constructors.getFirst().getLeadingAnnotations().stream()
                             .filter(a -> TypeUtils.isOfClassType(a.getType(), ANNOTATION_CONSTRUCTOR_BINDING))
                             .findAny();
 
@@ -76,7 +76,7 @@ public class RemoveConstructorBindingAnnotation extends Recipe {
                     if (bindingAnnotation.isPresent()) {
                         c = c.withBody(c.getBody().withStatements(
                                 ListUtils.map(c.getBody().getStatements(), s -> {
-                                    if (s == constructors.get(0)) {
+                                    if (s == constructors.getFirst()) {
                                         J.MethodDeclaration m = (J.MethodDeclaration) s;
                                         // Only visit the `J.MethodDeclaration` subtree and remove the target annotation.
                                         maybeRemoveImport(ANNOTATION_CONSTRUCTOR_BINDING);

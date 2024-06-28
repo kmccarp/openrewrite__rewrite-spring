@@ -38,8 +38,10 @@ public class PropagateAuthenticationServiceExceptions extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Remove any calls matching `AuthenticationEntryPointFailureHandler.setRethrowAuthenticationServiceException(true)`. "
-                + "See the corresponding [Sprint Security 6.0 migration step](https://docs.spring.io/spring-security/reference/6.0.0/migration/servlet/authentication.html#_propagate_authenticationserviceexceptions) for details.";
+        return """
+                Remove any calls matching `AuthenticationEntryPointFailureHandler.setRethrowAuthenticationServiceException(true)`. \
+                See the corresponding [Sprint Security 6.0 migration step](https://docs.spring.io/spring-security/reference/6.0.0/migration/servlet/authentication.html#_propagate_authenticationserviceexceptions) for details.\
+                """;
     }
 
     @Override
@@ -49,8 +51,8 @@ public class PropagateAuthenticationServiceExceptions extends Recipe {
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
                 method = super.visitMethodInvocation(method, ctx);
                 if (method.getSelect() != null && method.getArguments().size() == 1 && MATCHER.matches(method)) {
-                    Expression arg0 = method.getArguments().get(0);
-                    if (arg0 instanceof J.Literal && Objects.equals(((J.Literal) arg0).getValue(), Boolean.TRUE)) {
+                    Expression arg0 = method.getArguments().getFirst();
+                    if (arg0 instanceof J.Literal literal && Objects.equals(literal.getValue(), Boolean.TRUE)) {
                         //noinspection DataFlowIssue
                         return null;
                     }

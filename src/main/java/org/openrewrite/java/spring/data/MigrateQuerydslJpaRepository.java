@@ -69,9 +69,11 @@ public class MigrateQuerydslJpaRepository extends Recipe {
             @Override
             public J visitNewClass(J.NewClass newClass, ExecutionContext ctx) {
                 if (newClass.getClazz() != null && TypeUtils.isOfClassType(newClass.getClazz().getType(), originalFqn)) {
-                    String template = "new QuerydslJpaPredicateExecutor(#{any(org.springframework.data.jpa.repository.support.JpaEntityInformation)}, " +
-                            "#{any(javax.persistence.EntityManager)}, " +
-                            "#{any(org.springframework.data.querydsl.EntityPathResolver)}, null)";
+                    String template = """
+                            new QuerydslJpaPredicateExecutor(#{any(org.springframework.data.jpa.repository.support.JpaEntityInformation)}, \
+                            #{any(javax.persistence.EntityManager)}, \
+                            #{any(org.springframework.data.querydsl.EntityPathResolver)}, null)\
+                            """;
 
                     J.FieldAccess entityPathResolver = TypeTree.build("SimpleEntityPathResolver.INSTANCE");
                     return JavaTemplate.builder(template)
@@ -85,7 +87,7 @@ public class MigrateQuerydslJpaRepository extends Recipe {
                         .build().apply(
                             getCursor(),
                             newClass.getCoordinates().replace(),
-                            newClass.getArguments().get(0),
+                            newClass.getArguments().getFirst(),
                             newClass.getArguments().get(1),
                             newClass.getArguments().size() == 3 ? newClass.getArguments().get(2) : entityPathResolver);
                 }

@@ -46,17 +46,21 @@ public class UseTlsAmqpConnectionString extends Recipe {
     private static final String PREFIX_AMQP_SECURE = "amqps";
 
     @Option(displayName = "Property key",
-            description = "The Spring property key to perform updates against. " +
-                    "If this value is specified, the specified property will be used for searching, otherwise a default of `spring.rabbitmq.addresses` " +
-                    "will be used instead.",
+            description = """
+                    The Spring property key to perform updates against. \
+                    If this value is specified, the specified property will be used for searching, otherwise a default of `spring.rabbitmq.addresses` \
+                    will be used instead.\
+                    """,
             example = "spring.rabbitmq.addresses",
             required = false)
     @Nullable
     String propertyKey;
 
     @Option(displayName = "Old Port",
-            description = "The non-TLS enabled port number to replace with the TLS-enabled port. " +
-                    "If this value is specified, no changes will be made to amqp connection strings which do not contain this port number. ",
+            description = """
+                    The non-TLS enabled port number to replace with the TLS-enabled port. \
+                    If this value is specified, no changes will be made to amqp connection strings which do not contain this port number. \
+                    """,
             example = "1234")
     @Nullable
     Integer oldPort;
@@ -68,18 +72,22 @@ public class UseTlsAmqpConnectionString extends Recipe {
     Integer port;
 
     @Option(displayName = "TLS Property Key",
-            description = "The Spring property key to enable default TLS mode against. " +
-                    "If this value is specified, the specified property will be used when updating the default TLS mode, otherwise a default of " +
-                    "`spring.rabbitmq.ssl.enabled` will be used instead.",
+            description = """
+                    The Spring property key to enable default TLS mode against. \
+                    If this value is specified, the specified property will be used when updating the default TLS mode, otherwise a default of \
+                    `spring.rabbitmq.ssl.enabled` will be used instead.\
+                    """,
             example = "spring.rabbitmq.ssl.enabled",
             required = false)
     @Nullable
     String tlsPropertyKey;
 
     @Option(displayName = "Optional list of file path matcher",
-            description = "Each value in this list represents a glob expression that is used to match which files will " +
-                    "be modified. If this value is not present, this recipe will query the execution context for " +
-                    "reasonable defaults. (\"**/application.yml\", \"**/application.yaml\", and \"**/application.properties\".",
+            description = """
+                    Each value in this list represents a glob expression that is used to match which files will \
+                    be modified. If this value is not present, this recipe will query the execution context for \
+                    reasonable defaults. ("**/application.yml", "**/application.yaml", and "**/application.properties".\
+                    """,
             example = "**/application.yml",
             required = false)
     @Nullable
@@ -107,10 +115,10 @@ public class UseTlsAmqpConnectionString extends Recipe {
 
             @Override
             public Tree visit(@Nullable Tree t, ExecutionContext ctx) {
-                if (t instanceof Yaml.Documents && sourcePathMatches(((SourceFile) t).getSourcePath(), ctx)) {
+                if (t instanceof Yaml.Documents documents && sourcePathMatches(documents.getSourcePath(), ctx)) {
                     t = new UseTlsAmqpConnectionStringYaml(actualPropertyKey, oldPort, port, actualTlsPropertyKey, pathExpressions)
                         .getVisitor().visit(t, ctx);
-                } else if (t instanceof Properties.File && sourcePathMatches(((SourceFile) t).getSourcePath(), ctx)) {
+                } else if (t instanceof Properties.File file && sourcePathMatches(file.getSourcePath(), ctx)) {
                     t = new UseTlsAmqpConnectionStringProperties(actualPropertyKey, oldPort, port, actualTlsPropertyKey, pathExpressions)
                         .getVisitor().visit(t, ctx);
                 }

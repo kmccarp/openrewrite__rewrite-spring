@@ -60,9 +60,11 @@ public class AddSpringProperty extends Recipe {
     String comment;
 
     @Option(displayName = "Optional list of file path matcher",
-            description = "Each value in this list represents a glob expression that is used to match which files will " +
-                          "be modified. If this value is not present, this recipe will query the execution context for " +
-                          "reasonable defaults. (\"**/application.yml\", \"**/application.yml\", and \"**/application.properties\".",
+            description = """
+                          Each value in this list represents a glob expression that is used to match which files will \
+                          be modified. If this value is not present, this recipe will query the execution context for \
+                          reasonable defaults. ("**/application.yml", "**/application.yml", and "**/application.properties".\
+                          """,
             required = false,
             example = "[\"**/application.yml\"]")
     @Nullable
@@ -88,9 +90,9 @@ public class AddSpringProperty extends Recipe {
 
             @Override
             public @Nullable Tree visit(@Nullable Tree t, ExecutionContext ctx) {
-                if (t instanceof Yaml.Documents && sourcePathMatches(((SourceFile) t).getSourcePath(), ctx)) {
+                if (t instanceof Yaml.Documents documents && sourcePathMatches(documents.getSourcePath(), ctx)) {
                     t = createMergeYamlVisitor().getVisitor().visit(t, ctx);
-                } else if (t instanceof Properties.File && sourcePathMatches(((SourceFile) t).getSourcePath(), ctx)) {
+                } else if (t instanceof Properties.File file && sourcePathMatches(file.getSourcePath(), ctx)) {
                     t = new AddProperty(property, value, comment, null).getVisitor().visit(t, ctx);
                 }
                 return t;

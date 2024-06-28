@@ -56,10 +56,9 @@ public class AddSpringDependencyManagementPlugin extends Recipe {
     private static class UsesSpringDependencyManagement extends JavaIsoVisitor<ExecutionContext> {
         @Override
         public J visit(@Nullable Tree tree, ExecutionContext ctx) {
-            if (tree instanceof JavaSourceFile) {
-                JavaSourceFile cu = (JavaSourceFile) tree;
+            if (tree instanceof JavaSourceFile cu) {
                 Optional<GradleProject> maybeGp = cu.getMarkers().findFirst(GradleProject.class);
-                if (!maybeGp.isPresent()) {
+                if (maybeGp.isEmpty()) {
                     return cu;
                 }
                 GradleProject gp = maybeGp.get();

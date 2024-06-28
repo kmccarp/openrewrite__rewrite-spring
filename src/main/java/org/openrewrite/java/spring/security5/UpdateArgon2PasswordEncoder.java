@@ -63,8 +63,10 @@ public class UpdateArgon2PasswordEncoder extends Recipe {
 
     @Override
     public String getDescription() {
-        return "In Spring Security 5.8 some `Argon2PasswordEncoder` constructors have been deprecated in favor of factory methods. "
-                + "Refer to the [ Spring Security migration docs](https://docs.spring.io/spring-security/reference/5.8/migration/index.html#_update_argon2passwordencoder) for more information.";
+        return """
+                In Spring Security 5.8 some `Argon2PasswordEncoder` constructors have been deprecated in favor of factory methods. \
+                Refer to the [ Spring Security migration docs](https://docs.spring.io/spring-security/reference/5.8/migration/index.html#_update_argon2passwordencoder) for more information.\
+                """;
     }
 
     @Override
@@ -74,8 +76,8 @@ public class UpdateArgon2PasswordEncoder extends Recipe {
             @Override
             public J visitNewClass(J.NewClass newClass, ExecutionContext ctx) {
                 J j = super.visitNewClass(newClass, ctx);
-                if (j instanceof J.NewClass && TypeUtils.isOfClassType(((J.NewClass) j).getType(), ARGON2_PASSWORD_ENCODER_CLASS)) {
-                    newClass = (J.NewClass) j;
+                if (j instanceof J.NewClass class1 && TypeUtils.isOfClassType(class1.getType(), ARGON2_PASSWORD_ENCODER_CLASS)) {
+                    newClass = class1;
                     if (DEFAULT_CONSTRUCTOR_MATCHER.matches(newClass)) {
                         maybeAddImport(ARGON2_PASSWORD_ENCODER_CLASS);
 
@@ -83,7 +85,7 @@ public class UpdateArgon2PasswordEncoder extends Recipe {
                     } else {
                         List<Expression> arguments = newClass.getArguments();
                         if (FULL_CONSTRUCTOR_MATCHER.matches(newClass)) {
-                            Expression saltLength = arguments.get(0);
+                            Expression saltLength = arguments.getFirst();
                             Expression hashLength = arguments.get(1);
                             Expression parallelism = arguments.get(2);
                             Expression memory = arguments.get(3);
@@ -110,7 +112,7 @@ public class UpdateArgon2PasswordEncoder extends Recipe {
 
             boolean resolvedValueMatchesLiteral(Expression expression, Object value) {
                 Expression resolvedExpression = resolveExpression(expression, getCursor());
-                return resolvedExpression instanceof J.Literal && Objects.equals(((J.Literal) resolvedExpression).getValue(), value);
+                return resolvedExpression instanceof J.Literal l && Objects.equals(l.getValue(), value);
             }
 
             private JavaTemplate newV52FactoryMethodTemplate(ExecutionContext ctx) {

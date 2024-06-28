@@ -40,8 +40,10 @@ public class ChangeEmbeddedServletContainerCustomizer extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Find any classes implementing `EmbeddedServletContainerCustomizer` and change the interface to " +
-                "`WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>`.";
+        return """
+                Find any classes implementing `EmbeddedServletContainerCustomizer` and change the interface to \
+                `WebServerFactoryCustomizer<ConfigurableServletWebServerFactory>`.\
+                """;
     }
 
     @Override
@@ -77,16 +79,18 @@ public class ChangeEmbeddedServletContainerCustomizer extends Recipe {
                     .classpathFromResources(ctx, "spring-boot-2.*")
                     .build();
             J.CompilationUnit cu = parser.parse(
-                    "import org.springframework.boot.web.server.WebServerFactoryCustomizer;\n" +
-                            "import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;\n" +
-                            "public abstract class Template implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {}"
+                    """
+                    import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+                    import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+                    public abstract class Template implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {}\
+                    """
             )
                 .map(J.CompilationUnit.class::cast)
                 .findFirst()
                 .get();
 
             webFactoryCustomizerIdentifier = (J.ParameterizedType) requireNonNull(cu.getClasses()
-                    .get(0).getImplements()).get(0);
+                    .getFirst().getImplements()).getFirst();
         }
 
         return webFactoryCustomizerIdentifier.withId(Tree.randomId());

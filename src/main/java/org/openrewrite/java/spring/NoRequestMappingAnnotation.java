@@ -109,10 +109,10 @@ public class NoRequestMappingAnnotation extends Recipe {
                 // if there is only one remaining argument now, and it is "path" or "value", then we can drop the key name
                 if (a != null && a.getArguments() != null && a.getArguments().size() == 1) {
                     a = a.withArguments(ListUtils.map(a.getArguments(), arg -> {
-                        if (arg instanceof J.Assignment && ((J.Assignment) arg).getVariable() instanceof J.Identifier) {
-                            J.Identifier ident = (J.Identifier) ((J.Assignment) arg).getVariable();
+                        if (arg instanceof J.Assignment assignment && assignment.getVariable() instanceof J.Identifier) {
+                            J.Identifier ident = (J.Identifier) assignment.getVariable();
                             if ("path".equals(ident.getSimpleName()) || "value".equals(ident.getSimpleName())) {
-                                return ((J.Assignment) arg).getAssignment().withPrefix(Space.EMPTY);
+                                return assignment.getAssignment().withPrefix(Space.EMPTY);
                             }
                         }
                         return arg;
@@ -127,9 +127,9 @@ public class NoRequestMappingAnnotation extends Recipe {
                 return Optional.empty();
             }
             return annotation.getArguments().stream()
-                    .filter(arg -> arg instanceof J.Assignment
-                            && ((J.Assignment) arg).getVariable() instanceof J.Identifier
-                            && "method".equals(((J.Identifier) ((J.Assignment) arg).getVariable()).getSimpleName()))
+                    .filter(arg -> arg instanceof J.Assignment a
+                            && a.getVariable() instanceof J.Identifier
+                            && "method".equals(((J.Identifier) a.getVariable()).getSimpleName()))
                     .map(J.Assignment.class::cast)
                     .findFirst();
         }
@@ -158,11 +158,11 @@ public class NoRequestMappingAnnotation extends Recipe {
                     if(initializer == null || initializer.size() != 1) {
                         return null;
                     }
-                    Expression methodName = initializer.get(0);
-                    if(methodName instanceof J.Identifier) {
-                        return ((J.Identifier)methodName).getSimpleName();
-                    } else if(methodName instanceof J.FieldAccess) {
-                        return ((J.FieldAccess) methodName).getSimpleName();
+                    Expression methodName = initializer.getFirst();
+                    if(methodName instanceof J.Identifier identifier) {
+                        return identifier.getSimpleName();
+                    } else if(methodName instanceof J.FieldAccess access) {
+                        return access.getSimpleName();
                     }
                 } else if(assignment.getAssignment() instanceof J.Identifier) {
                     return ((J.Identifier) assignment.getAssignment()).getSimpleName();

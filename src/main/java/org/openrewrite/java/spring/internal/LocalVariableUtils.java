@@ -35,10 +35,10 @@ public class LocalVariableUtils {
 
     public static Expression resolveExpression(Expression expression, Cursor cursor) {
         JavaType.Variable fieldType = null;
-        if (expression instanceof J.Identifier) {
-            fieldType = ((J.Identifier) expression).getFieldType();
-        } else if (expression instanceof J.FieldAccess) {
-            fieldType = ((J.FieldAccess) expression).getName().getFieldType();
+        if (expression instanceof J.Identifier identifier) {
+            fieldType = identifier.getFieldType();
+        } else if (expression instanceof J.FieldAccess access) {
+            fieldType = access.getName().getFieldType();
         }
         if (fieldType == null) {
             return expression;
@@ -59,20 +59,20 @@ public class LocalVariableUtils {
         Object parentValue = parent.getValue();
         if (parentValue instanceof SourceFile) {
             return null;
-        } else if (parentValue instanceof J.MethodDeclaration) {
-            return getRootOwner(((J.MethodDeclaration) parentValue).getMethodType());
+        } else if (parentValue instanceof J.MethodDeclaration declaration) {
+            return getRootOwner(declaration.getMethodType());
         } else {
             return getRootOwner(((J.ClassDeclaration) parentValue).getType());
         }
     }
 
     private static JavaType getRootOwner(JavaType type) {
-        if (type instanceof JavaType.Variable) {
-            return getRootOwner(((JavaType.Variable) type).getOwner());
-        } else if (type instanceof JavaType.Method) {
-            return getRootOwner(((JavaType.Method) type).getDeclaringType());
-        } else if (type instanceof JavaType.FullyQualified) {
-            JavaType.FullyQualified owner = ((JavaType.FullyQualified) type).getOwningClass();
+        if (type instanceof JavaType.Variable variable) {
+            return getRootOwner(variable.getOwner());
+        } else if (type instanceof JavaType.Method method) {
+            return getRootOwner(method.getDeclaringType());
+        } else if (type instanceof JavaType.FullyQualified qualified) {
+            JavaType.FullyQualified owner = qualified.getOwningClass();
             return owner != null ? getRootOwner(owner) : type;
         } else {
             return type;
@@ -94,10 +94,9 @@ public class LocalVariableUtils {
         J value = cursor.getValue();
         if (value instanceof SourceFile) {
             return null;
-        } else if (value instanceof J.MethodDeclaration) {
-            found = findVariable(((J.MethodDeclaration) value).getParameters(), name);
-        } else if (value instanceof J.Block) {
-            J.Block block = (J.Block) value;
+        } else if (value instanceof J.MethodDeclaration declaration) {
+            found = findVariable(declaration.getParameters(), name);
+        } else if (value instanceof J.Block block) {
             List<Statement> statements = block.getStatements();
             boolean checkAllStatements = cursor.getParentTreeCursor().getValue() instanceof J.ClassDeclaration;
             if (!checkAllStatements) {
@@ -105,22 +104,21 @@ public class LocalVariableUtils {
                 statements = index != -1 ? statements.subList(0, index) : statements;
             }
             found = findVariable(statements, name);
-        } else if (value instanceof J.ForLoop) {
-            found = findVariable(((J.ForLoop) value).getControl().getInit(), name);
-        } else if (value instanceof J.Try && ((J.Try) value).getResources() != null) {
-            found = findVariable(((J.Try) value).getResources().stream().map(J.Try.Resource::getVariableDeclarations).collect(Collectors.toList()), name);
-        } else if (value instanceof J.Lambda) {
-            found = findVariable(((J.Lambda) value).getParameters().getParameters(), name);
-        } else if (value instanceof J.VariableDeclarations) {
-            found = findVariable(Collections.singletonList(((J.VariableDeclarations) value)), name);
+        } else if (value instanceof J.ForLoop loop) {
+            found = findVariable(loop.getControl().getInit(), name);
+        } else if (value instanceof J.Try try1 && try1.getResources() != null) {
+            found = findVariable(try1.getResources().stream().map(J.Try.Resource::getVariableDeclarations).collect(Collectors.toList()), name);
+        } else if (value instanceof J.Lambda lambda) {
+            found = findVariable(lambda.getParameters().getParameters(), name);
+        } else if (value instanceof J.VariableDeclarations declarations) {
+            found = findVariable(Collections.singletonList(declarations), name);
         }
         return found.map(f -> f.isFinal ? f.variable.getInitializer() : null).orElseGet(() -> resolveVariable0(name, value, cursor.getParentTreeCursor()));
     }
 
     private static Optional<VariableMatch> findVariable(List<? extends J> list, String name) {
         for (J j : list) {
-            if (j instanceof J.VariableDeclarations) {
-                J.VariableDeclarations declaration = (J.VariableDeclarations) j;
+            if (j instanceof J.VariableDeclarations declaration) {
                 for (J.VariableDeclarations.NamedVariable variable : declaration.getVariables()) {
                     if (variable.getSimpleName().equals(name)) {
                         return Optional.of(new VariableMatch(variable, declaration.hasModifier(J.Modifier.Type.Final)));

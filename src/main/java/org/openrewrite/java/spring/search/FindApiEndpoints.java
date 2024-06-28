@@ -50,9 +50,11 @@ public class FindApiEndpoints extends Recipe {
     @Override
     public String getDescription() {
         //language=markdown
-        return "Find all HTTP API endpoints exposed by Spring applications. " +
-               "More specifically, this marks method declarations annotated with `@RequestMapping`, `@GetMapping`, " +
-               "`@PostMapping`, `@PutMapping`, `@DeleteMapping`, and `@PatchMapping` as search results.";
+        return """
+               Find all HTTP API endpoints exposed by Spring applications. \
+               More specifically, this marks method declarations annotated with `@RequestMapping`, `@GetMapping`, \
+               `@PostMapping`, `@PutMapping`, `@DeleteMapping`, and `@PatchMapping` as search results.\
+               """;
     }
 
     @Override
@@ -111,11 +113,10 @@ public class FindApiEndpoints extends Recipe {
     private String getArg(J.Annotation annotation, String key, String defaultValue) {
         if (annotation.getArguments() != null) {
             for (Expression argument : annotation.getArguments()) {
-                if (argument instanceof J.Literal) {
+                if (argument instanceof J.Literal literal) {
                     //noinspection ConstantConditions
-                    return (String) ((J.Literal) argument).getValue();
-                } else if (argument instanceof J.Assignment) {
-                    J.Assignment arg = (J.Assignment) argument;
+                    return (String) literal.getValue();
+                } else if (argument instanceof J.Assignment arg) {
                     if (((J.Identifier) arg.getVariable()).getSimpleName().equals(key)) {
                         if (arg.getAssignment() instanceof J.FieldAccess) {
                             return ((J.FieldAccess) arg.getAssignment()).getSimpleName();

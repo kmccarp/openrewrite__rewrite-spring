@@ -44,9 +44,11 @@ public class MoveAutoConfigurationToImportsFile extends ScanningRecipe<MoveAutoC
 
     @Override
     public String getDescription() {
-        return "Use `AutoConfiguration#imports` instead of the deprecated entry " +
-                "`EnableAutoConfiguration` in `spring.factories` when defining " +
-                "autoconfiguration classes.";
+        return """
+                Use `AutoConfiguration#imports` instead of the deprecated entry \
+                `EnableAutoConfiguration` in `spring.factories` when defining \
+                autoconfiguration classes.\
+                """;
     }
 
     @Override
@@ -67,8 +69,8 @@ public class MoveAutoConfigurationToImportsFile extends ScanningRecipe<MoveAutoC
         return new TreeVisitor<Tree, ExecutionContext>() {
             @Override
             public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
-                if (tree instanceof PlainText) {
-                    PlainText source = ((PlainText) tree);
+                if (tree instanceof PlainText text) {
+                    PlainText source =text;
                     Path sourcePath = source.getSourcePath();
                     if (sourcePath.endsWith("spring.factories")) {
                         Set<String> configs = new HashSet<>();

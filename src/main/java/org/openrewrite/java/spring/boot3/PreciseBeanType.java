@@ -46,8 +46,7 @@ public class PreciseBeanType extends Recipe {
                 J.MethodDeclaration m = super.visitMethodDeclaration(method, ctx);
                 Object o = getCursor().pollMessage(MSG_KEY);
                 if (o != null && (method.getReturnTypeExpression() != null && !o.equals(method.getReturnTypeExpression().getType())) && isBeanMethod(m)) {
-                    if (o instanceof JavaType.FullyQualified) {
-                        JavaType.FullyQualified actualType = (JavaType.FullyQualified) o;
+                    if (o instanceof JavaType.FullyQualified actualType) {
                         if (m.getReturnTypeExpression() instanceof J.Identifier) {
                             J.Identifier identifierReturnExpr = (J.Identifier) m.getReturnTypeExpression();
                             maybeAddImport(actualType);
@@ -70,8 +69,7 @@ public class PreciseBeanType extends Recipe {
                             );
                         }
 
-                    } else if (o instanceof JavaType.Array) {
-                        JavaType.Array actualType = (JavaType.Array) o;
+                    } else if (o instanceof JavaType.Array actualType) {
                         if (m.getReturnTypeExpression() instanceof J.ArrayType && actualType.getElemType() instanceof JavaType.FullyQualified) {
                             JavaType.FullyQualified actualElementType = (JavaType.FullyQualified) actualType.getElemType();
                             J.ArrayType arrayType = (J.ArrayType) m.getReturnTypeExpression();

@@ -76,8 +76,8 @@ public class ChangeSpringPropertyKey extends Recipe {
             public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
                 if (tree instanceof Yaml.Documents) {
                     tree = yamlChangePropertyKey.getVisitor().visit(tree, ctx);
-                } else if (tree instanceof Properties.File) {
-                    if (FindProperties.find((Properties.File) tree, newPropertyKey, true).isEmpty()) {
+                } else if (tree instanceof Properties.File file) {
+                    if (FindProperties.find(file, newPropertyKey, true).isEmpty()) {
                         Tree newTree = propertiesChangePropertyKey.getVisitor().visit(tree, ctx);
                         // for compatibility with yaml syntax, a spring property key will never have both a (scalar) value and also subproperties
                         if (newTree == tree) {

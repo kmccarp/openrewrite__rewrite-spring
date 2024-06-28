@@ -138,7 +138,7 @@ public class UpgradeExplicitSpringBootDependencies extends Recipe {
                 String dependencyVersion = springBootDependenciesMap.get(groupId + ":" + artifactId);
                 if (dependencyVersion != null) {
                     Optional<Xml.Tag> version = tag.getChild("version");
-                    if (!version.isPresent() || !version.get().getValue().isPresent()) {
+                    if (version.isEmpty() || version.get().getValue().isEmpty()) {
                         return;
                     }
                     // TODO: we could use the org.openrewrite.java.dependencies.UpgradeDependencyVersion if we implement there a getVisitor with a similar logic than here,

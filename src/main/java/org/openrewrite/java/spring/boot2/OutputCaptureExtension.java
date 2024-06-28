@@ -64,7 +64,7 @@ public class OutputCaptureExtension extends Recipe {
                     if (TypeUtils.isOfClassType(fieldType, "org.springframework.boot.test.system.OutputCaptureRule") ||
                             TypeUtils.isOfClassType(fieldType, "org.springframework.boot.test.rule.OutputCapture")) {
 
-                        String fieldName = field.getVariables().get(0).getSimpleName();
+                        String fieldName = field.getVariables().getFirst().getSimpleName();
 
                         //Add the CapturedOutput parameter to any method that has a method call to OutputCapture
                         doAfterVisit(new AddCapturedOutputParameter(fieldName));
@@ -142,7 +142,7 @@ public class OutputCaptureExtension extends Recipe {
                     .javaParser(JavaParser.fromJavaVersion()
                             .classpathFromResources(ctx, "spring-boot-test-2.*", "junit-jupiter-api-5.*"))
                     .build();
-            m = matchesTemplate.apply(getCursor(), m.getCoordinates().replace(), m.getArguments().get(0), variableName);
+            m = matchesTemplate.apply(getCursor(), m.getCoordinates().replace(), m.getArguments().getFirst(), variableName);
             return m;
         }
     }
@@ -184,7 +184,7 @@ public class OutputCaptureExtension extends Recipe {
                         ))
                 );
 
-                if (m.getParameters().iterator().next() instanceof J.Empty) {
+                if (m.getParameters().getFirst() instanceof J.Empty) {
                     m = m.withParameters(singletonList(param));
                 } else {
                     m = m.withParameters(ListUtils.concat(m.getParameters(), param.withPrefix(Space.format(" "))));

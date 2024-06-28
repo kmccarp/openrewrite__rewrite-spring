@@ -84,9 +84,9 @@ public class EntityIdForRepositoryVisitor<T> extends JavaIsoVisitor<T> {
                     List<JavaType> typeParams = repoType.getTypeParameters();
                     boolean domainTypeChanged = false;
                     boolean idTypeChanged = false;
-                    if (repoType instanceof JavaType.Parameterized) {
+                    if (repoType instanceof JavaType.Parameterized parameterized) {
                         if (domainType instanceof JavaType.GenericTypeVariable || domainType == null) {
-                            int idx = domainType == null ? -1 : findTypeVarIndex(((JavaType.Parameterized) repoType).getType().getTypeParameters(), ((JavaType.GenericTypeVariable) domainType).getName());
+                            int idx = domainType == null ? -1 : findTypeVarIndex(parameterized.getType().getTypeParameters(), ((JavaType.GenericTypeVariable) domainType).getName());
                             if (idx < 0) {
                                 domainType = typeParams.get(domainTypeIndex);
                             } else {
@@ -97,7 +97,7 @@ public class EntityIdForRepositoryVisitor<T> extends JavaIsoVisitor<T> {
                         }
                         if (idType instanceof JavaType.GenericTypeVariable || idType == null) {
                             idTypeIndexInChain = i;
-                            int idx = idType == null ? -1 : findTypeVarIndex(((JavaType.Parameterized) repoType).getType().getTypeParameters(), ((JavaType.GenericTypeVariable) idType).getName());
+                            int idx = idType == null ? -1 : findTypeVarIndex(parameterized.getType().getTypeParameters(), ((JavaType.GenericTypeVariable) idType).getName());
                             if (idx < 0) {
                                 idType = typeParams.get(idTypeIndex);
                             } else {
@@ -130,8 +130,8 @@ public class EntityIdForRepositoryVisitor<T> extends JavaIsoVisitor<T> {
                     }
                 }
                 JavaType.FullyQualified domainClassType;
-                if (domainType instanceof JavaType.GenericTypeVariable) {
-                    domainClassType = TypeUtils.asFullyQualified(((JavaType.GenericTypeVariable) domainType).getBounds().get(0));
+                if (domainType instanceof JavaType.GenericTypeVariable variable) {
+                    domainClassType = TypeUtils.asFullyQualified(variable.getBounds().getFirst());
                 } else {
                     domainClassType = TypeUtils.asFullyQualified(domainType);
                 }
@@ -177,8 +177,7 @@ public class EntityIdForRepositoryVisitor<T> extends JavaIsoVisitor<T> {
     }
 
     private static TypeTree markTypeParam(TypeTree tt, int idx, Marker m) {
-        if (tt instanceof J.ParameterizedType) {
-            J.ParameterizedType pt = (J.ParameterizedType) tt;
+        if (tt instanceof J.ParameterizedType pt) {
             List<Expression> astParams = pt.getTypeParameters();
             if (astParams != null && idx >= 0 && idx < astParams.size()) {
                 astParams.set(idx, astParams.get(idx).withMarkers(astParams.get(idx).getMarkers().addIfAbsent(m)));
@@ -191,8 +190,8 @@ public class EntityIdForRepositoryVisitor<T> extends JavaIsoVisitor<T> {
     private static int findTypeVarIndex(List<JavaType> typeParams, String genericVarName) {
         for (int i = 0; i < typeParams.size(); i++) {
             JavaType t = typeParams.get(i);
-            if (t instanceof JavaType.GenericTypeVariable) {
-                if (genericVarName.equals(((JavaType.GenericTypeVariable) t).getName())) {
+            if (t instanceof JavaType.GenericTypeVariable variable) {
+                if (genericVarName.equals(variable.getName())) {
                     return i;
                 }
             }
@@ -207,7 +206,7 @@ public class EntityIdForRepositoryVisitor<T> extends JavaIsoVisitor<T> {
         ArrayList<JavaType.FullyQualified> ls = new ArrayList<>(visited.size() + 1);
         ls.addAll(visited);
         ls.add(type);
-        if (type instanceof JavaType.Parameterized &&  REPOSITORY.equals(((JavaType.Parameterized) type).getType().getFullyQualifiedName())) {
+        if (type instanceof JavaType.Parameterized parameterized &&  REPOSITORY.equals(parameterized.getType().getFullyQualifiedName())) {
             return ls;
         }
 
@@ -238,8 +237,7 @@ public class EntityIdForRepositoryVisitor<T> extends JavaIsoVisitor<T> {
                     if (!isValidRepoIdType(repoIdType, idType)) {
                         Marker marker = createMarker(idType);
                         return repoDefAnnotation.withArguments(ListUtils.map(repoDefAnnotation.getArguments(), arg -> {
-                            if (arg instanceof J.Assignment) {
-                                J.Assignment assign = (J.Assignment) arg;
+                            if (arg instanceof J.Assignment assign) {
                                 if (assign.getVariable() instanceof J.Identifier && ID_CLASS.equals(((J.Identifier) assign.getVariable()).getSimpleName())) {
                                     return assign.withAssignment(assign.getAssignment().withMarkers(assign.getAssignment().getMarkers().addIfAbsent(marker)));
                                 }
@@ -276,10 +274,9 @@ public class EntityIdForRepositoryVisitor<T> extends JavaIsoVisitor<T> {
         J.Assignment assign = getArgument(a, arg);
         if (assign != null) {
             JavaType type = assign.getAssignment().getType();
-            if (type instanceof JavaType.Parameterized) {
-                JavaType.Parameterized parameterizedType = (JavaType.Parameterized) type;
+            if (type instanceof JavaType.Parameterized parameterizedType) {
                 if ("java.lang.Class".equals(parameterizedType.getType().getFullyQualifiedName())) {
-                    return parameterizedType.getTypeParameters().get(0);
+                    return parameterizedType.getTypeParameters().getFirst();
                 }
             }
         }
@@ -289,8 +286,7 @@ public class EntityIdForRepositoryVisitor<T> extends JavaIsoVisitor<T> {
     private static @Nullable J.Assignment getArgument(J.Annotation a, String arg) {
         if (a.getArguments() != null) {
             for (Expression e : a.getArguments()) {
-                if (e instanceof J.Assignment) {
-                    J.Assignment assign = (J.Assignment) e;
+                if (e instanceof J.Assignment assign) {
                     if (assign.getVariable() instanceof J.Identifier && arg.equals(((J.Identifier) assign.getVariable()).getSimpleName())) {
                         return assign;
                     }

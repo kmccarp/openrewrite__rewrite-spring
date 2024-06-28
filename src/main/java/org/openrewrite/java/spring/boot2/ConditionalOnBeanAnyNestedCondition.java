@@ -61,14 +61,12 @@ public class ConditionalOnBeanAnyNestedCondition extends Recipe {
                 // First check for an array of Class arguments
                 List<String> conditionalOnBeanCandidates = new ArrayList<>();
                 for (Expression p : a.getArguments()) {
-                    if (p instanceof J.NewArray) {
-                        J.NewArray na = (J.NewArray) p;
+                    if (p instanceof J.NewArray na) {
                         if (na.getInitializer() != null && na.getInitializer().size() > 1) {
                             for (Expression expression : na.getInitializer()) {
                                 J.FieldAccess fieldAccess = (J.FieldAccess) expression;
                                 Expression target = fieldAccess.getTarget();
-                                if (target instanceof J.Identifier) {
-                                    J.Identifier identifier = (J.Identifier) target;
+                                if (target instanceof J.Identifier identifier) {
                                     String simpleName = identifier.getSimpleName();
                                     conditionalOnBeanCandidates.add(simpleName);
                                 }
@@ -82,10 +80,10 @@ public class ConditionalOnBeanAnyNestedCondition extends Recipe {
                 // If class arguments are not found then search for an array of type arguments
                 if (conditionalOnBeanCandidates.isEmpty()) {
                     for (Expression arg : a.getArguments()) {
-                        if (arg instanceof J.Assignment
-                                && ((J.Assignment) arg).getAssignment() instanceof J.NewArray
-                                && "type".equals(((J.Identifier) ((J.Assignment) arg).getVariable()).getSimpleName())) {
-                            J.NewArray na = (J.NewArray) ((J.Assignment) arg).getAssignment();
+                        if (arg instanceof J.Assignment assignment
+                                && assignment.getAssignment() instanceof J.NewArray
+                                && "type".equals(((J.Identifier) assignment.getVariable()).getSimpleName())) {
+                            J.NewArray na = (J.NewArray) assignment.getAssignment();
                             if (na.getInitializer() != null) {
                                 for (Expression l : na.getInitializer()) {
                                     J.Literal lit = (J.Literal) l;
@@ -107,8 +105,7 @@ public class ConditionalOnBeanAnyNestedCondition extends Recipe {
                     // The associated conditional class must exist for the JavaTemplate to generate a type attributed AST
                     boolean anyConditionClassExists = false;
                     for (Statement statement : getCursor().firstEnclosingOrThrow(J.ClassDeclaration.class).getBody().getStatements()) {
-                        if (statement instanceof J.ClassDeclaration) {
-                            J.ClassDeclaration c = (J.ClassDeclaration) statement;
+                        if (statement instanceof J.ClassDeclaration c) {
                             if (c.getSimpleName().equals(conditionalClassName)) {
                                 anyConditionClassExists = true;
                                 break;
@@ -179,7 +176,7 @@ public class ConditionalOnBeanAnyNestedCondition extends Recipe {
             StringBuilder s = new StringBuilder("private static class ").append(conditionClassName)
                     .append(" extends AnyNestedCondition {")
                     .append(conditionClassName).append("(){super(ConfigurationPhase.REGISTER_BEAN);}");
-            conditionalIdentifiers.stream().sorted().forEach(ci -> s.append(String.format(conditionalClassFormat, ci, getSimpleName(ci))));
+            conditionalIdentifiers.stream().sorted().forEach(ci -> s.append(conditionalClassFormat.formatted(ci, getSimpleName(ci))));
             s.append("}");
             return s.toString();
         }

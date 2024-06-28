@@ -35,8 +35,10 @@ public class MigrateActuatorMediaTypeToApiVersion extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Spring Boot `ActuatorMediaType` was deprecated in 2.5 in favor of `ApiVersion#getProducedMimeType()`. " +
-                "Replace `MediaType.parseMediaType(ActuatorMediaType.Vx_JSON)` with `MediaType.asMediaType(ApiVersion.Vx.getProducedMimeType())`.";
+        return """
+                Spring Boot `ActuatorMediaType` was deprecated in 2.5 in favor of `ApiVersion#getProducedMimeType()`. \
+                Replace `MediaType.parseMediaType(ActuatorMediaType.Vx_JSON)` with `MediaType.asMediaType(ApiVersion.Vx.getProducedMimeType())`.\
+                """;
     }
 
     @Override
@@ -48,9 +50,8 @@ public class MigrateActuatorMediaTypeToApiVersion extends Recipe {
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
                 J.MethodInvocation mi = super.visitMethodInvocation(method, ctx);
                 if (mediaTypeMatcher.matches(mi)) {
-                    Expression arg0 = mi.getArguments().get(0);
-                    if (arg0 instanceof J.FieldAccess) {
-                        J.FieldAccess expFa = (J.FieldAccess) arg0;
+                    Expression arg0 = mi.getArguments().getFirst();
+                    if (arg0 instanceof J.FieldAccess expFa) {
                         if (TypeUtils.isOfClassType(expFa.getTarget().getType(), "org.springframework.boot.actuate.endpoint.http.ActuatorMediaType")) {
                             String apiVersion = null;
                             if ("V2_JSON".equals(expFa.getSimpleName())) {

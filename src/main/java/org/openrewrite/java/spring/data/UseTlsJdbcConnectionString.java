@@ -39,9 +39,11 @@ import java.net.URISyntaxException;
 public class UseTlsJdbcConnectionString extends Recipe {
     @Option(
             displayName = "Property key",
-            description = "The Spring property key to perform updates against. " +
-                    "If this value is specified, the specified property will be used for searching, otherwise a default of `spring.datasource.url` " +
-                    "will be used instead.",
+            description = """
+                    The Spring property key to perform updates against. \
+                    If this value is specified, the specified property will be used for searching, otherwise a default of `spring.datasource.url` \
+                    will be used instead.\
+                    """,
             example = "spring.datasource.url"
     )
     @Nullable
@@ -49,8 +51,10 @@ public class UseTlsJdbcConnectionString extends Recipe {
 
     @Option(
             displayName = "Old Port",
-            description = "The non-TLS enabled port number to replace with the TLS-enabled port. " +
-                    "If this value is specified, no changes will be made to jdbc connection strings which do not contain this port number. ",
+            description = """
+                    The non-TLS enabled port number to replace with the TLS-enabled port. \
+                    If this value is specified, no changes will be made to jdbc connection strings which do not contain this port number. \
+                    """,
             example = "1234")
     @Nullable
     Integer oldPort;
@@ -64,8 +68,10 @@ public class UseTlsJdbcConnectionString extends Recipe {
 
     @Option(
             displayName = "Connection attribute",
-            description = "A connection attribute, if any, indicating to the JDBC " +
-                    "provider that this is a TLS connection.",
+            description = """
+                    A connection attribute, if any, indicating to the JDBC \
+                    provider that this is a TLS connection.\
+                    """,
             example = "sslConnection=true")
     @Nullable
     String attribute;
@@ -77,10 +83,12 @@ public class UseTlsJdbcConnectionString extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Increasingly, for compliance reasons (e.g. [NACHA](https://www.nacha.org/sites/default/files/2022-06/End_User_Briefing_Supplementing_Data_Security_UPDATED_FINAL.pdf)), JDBC connection strings " +
-                "should be TLS-enabled. This recipe will update the port and " +
-                "optionally add a connection attribute to indicate that the " +
-                "connection is TLS-enabled.";
+        return """
+                Increasingly, for compliance reasons (e.g. [NACHA](https://www.nacha.org/sites/default/files/2022-06/End_User_Briefing_Supplementing_Data_Security_UPDATED_FINAL.pdf)), JDBC connection strings \
+                should be TLS-enabled. This recipe will update the port and \
+                optionally add a connection attribute to indicate that the \
+                connection is TLS-enabled.\
+                """;
     }
 
     @Override

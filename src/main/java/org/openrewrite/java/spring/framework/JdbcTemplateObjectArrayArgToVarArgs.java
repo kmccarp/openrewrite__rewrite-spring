@@ -59,7 +59,7 @@ public class JdbcTemplateObjectArrayArgToVarArgs extends Recipe {
                 List<Expression> args = mi.getArguments();
                 if (args.size() == 3 && shouldSwapArgs(args.get(1).getType(), args.get(2).getType())) {
                     List<Expression> reOrderedArgs = new ArrayList<>(3);
-                    reOrderedArgs.add(args.get(0));
+                    reOrderedArgs.add(args.getFirst());
                     reOrderedArgs.add(args.get(2).withPrefix(args.get(1).getPrefix()));
                     reOrderedArgs.add(args.get(1).withPrefix(args.get(2).getPrefix()));
                     mi = mi.withArguments(reOrderedArgs);
@@ -70,7 +70,7 @@ public class JdbcTemplateObjectArrayArgToVarArgs extends Recipe {
 
         private boolean shouldSwapArgs(@Nullable JavaType arg1, @Nullable JavaType arg2) {
             return arg1 instanceof JavaType.Array && (
-                    (arg2 instanceof JavaType.Parameterized && ((JavaType.Parameterized) arg2).getTypeParameters().get(0) instanceof JavaType.Class)
+                    (arg2 instanceof JavaType.Parameterized p && p.getTypeParameters().getFirst() instanceof JavaType.Class)
                             || TypeUtils.isOfClassType(arg2, "org.springframework.jdbc.core.RowMapper")
                             || TypeUtils.isOfClassType(arg2, "org.springframework.jdbc.core.ResultSetExtractor")
                             || TypeUtils.isOfClassType(arg2, "org.springframework.jdbc.core.RowCallbackHandler")

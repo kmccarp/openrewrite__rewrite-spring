@@ -47,8 +47,10 @@ public class RequireExplicitSavingOfSecurityContextRepository extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Remove explicit `SecurityContextConfigurer.requireExplicitSave(true)` opt-in as that is the new default in Spring Security 6. "
-                + "See the corresponding [Sprint Security 6.0 migration step](https://docs.spring.io/spring-security/reference/6.0.0/migration/servlet/session-management.html#_require_explicit_saving_of_securitycontextrepository) for details.";
+        return """
+                Remove explicit `SecurityContextConfigurer.requireExplicitSave(true)` opt-in as that is the new default in Spring Security 6. \
+                See the corresponding [Sprint Security 6.0 migration step](https://docs.spring.io/spring-security/reference/6.0.0/migration/servlet/session-management.html#_require_explicit_saving_of_securitycontextrepository) for details.\
+                """;
     }
 
     @Override
@@ -59,7 +61,7 @@ public class RequireExplicitSavingOfSecurityContextRepository extends Recipe {
                 method = super.visitMethodInvocation(method, ctx);
                 if (method.getSelect() != null && method.getArguments().size() == 1
                         && REQUIRE_EXPLICIT_SAVE_MATCHER.matches(method)
-                        && isTrue(method.getArguments().get(0))) {
+                        && isTrue(method.getArguments().getFirst())) {
                     return ToBeRemoved.withMarker(method);
                 } else if (method.getSelect() instanceof J.MethodInvocation && ToBeRemoved.hasMarker(method.getSelect())) {
                     return method.withSelect(((J.MethodInvocation) method.getSelect()).getSelect());
@@ -77,12 +79,12 @@ public class RequireExplicitSavingOfSecurityContextRepository extends Recipe {
             public J.Lambda visitLambda(J.Lambda lambda, ExecutionContext ctx) {
                 lambda = super.visitLambda(lambda, ctx);
                 J body = lambda.getBody();
-                if (body instanceof J.MethodInvocation && ToBeRemoved.hasMarker(body)) {
-                    Expression select = ((J.MethodInvocation) body).getSelect();
+                if (body instanceof J.MethodInvocation invocation && ToBeRemoved.hasMarker(body)) {
+                    Expression select = invocation.getSelect();
                     List<J> parameters = lambda.getParameters().getParameters();
-                    if (select instanceof J.Identifier && !parameters.isEmpty() && parameters.get(0) instanceof J.VariableDeclarations) {
-                        J.VariableDeclarations declarations = (J.VariableDeclarations) parameters.get(0);
-                        if (((J.Identifier) select).getSimpleName().equals(declarations.getVariables().get(0).getSimpleName())) {
+                    if (select instanceof J.Identifier identifier && !parameters.isEmpty() && parameters.getFirst() instanceof J.VariableDeclarations) {
+                        J.VariableDeclarations declarations = (J.VariableDeclarations) parameters.getFirst();
+                        if (identifier.getSimpleName().equals(declarations.getVariables().getFirst().getSimpleName())) {
                             return ToBeRemoved.withMarker(lambda.withBody(J.Block.createEmptyBlock().withPrefix(body.getPrefix())));
                         }
                     } else if (select instanceof J.MethodInvocation) {
@@ -104,8 +106,8 @@ public class RequireExplicitSavingOfSecurityContextRepository extends Recipe {
                 if (statements.stream().anyMatch(ToBeRemoved::hasMarker)) {
                     //noinspection DataFlowIssue
                     return block.withStatements(statements.stream()
-                            .filter(s -> !ToBeRemoved.hasMarker(s) || s instanceof J.MethodInvocation && ((J.MethodInvocation) s).getSelect() instanceof J.MethodInvocation)
-                            .map(s -> s instanceof J.MethodInvocation && ToBeRemoved.hasMarker(s) ? ((J.MethodInvocation) s).getSelect().withPrefix(s.getPrefix()) : s)
+                            .filter(s -> !ToBeRemoved.hasMarker(s) || s instanceof J.MethodInvocation mi && mi.getSelect() instanceof J.MethodInvocation)
+                            .map(s -> s instanceof J.MethodInvocation mi && ToBeRemoved.hasMarker(s) ? mi.getSelect().withPrefix(s.getPrefix()) : s)
                             .collect(Collectors.toList()));
                 }
                 return block;
@@ -132,8 +134,8 @@ public class RequireExplicitSavingOfSecurityContextRepository extends Recipe {
     }
 
     public static boolean isTrue(Expression expression) {
-        if (expression instanceof J.Literal) {
-            return expression.getType() == JavaType.Primitive.Boolean && Boolean.TRUE.equals(((J.Literal) expression).getValue());
+        if (expression instanceof J.Literal literal) {
+            return expression.getType() == JavaType.Primitive.Boolean && Boolean.TRUE.equals(literal.getValue());
         }
         return false;
     }

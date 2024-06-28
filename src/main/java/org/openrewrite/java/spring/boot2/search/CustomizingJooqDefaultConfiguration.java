@@ -57,11 +57,13 @@ public class CustomizingJooqDefaultConfiguration extends Recipe {
 
     @Override
     public String getDescription() {
-        return "To streamline the customization of jOOQ’s `DefaultConfiguration`, " +
-                "a bean that implements `DefaultConfigurationCustomizer` can now be defined. " +
-                "This customizer callback should be used in favour of defining one or more `*Provider` beans, " +
-                "the support for which has now been deprecated. " +
-                "See [Spring Boot 2.5 jOOQ customization](https://docs.spring.io/spring-boot/docs/2.5.x/reference/htmlsingle/#features.sql.jooq.customizing).";
+        return """
+                To streamline the customization of jOOQ’s `DefaultConfiguration`, \
+                a bean that implements `DefaultConfigurationCustomizer` can now be defined. \
+                This customizer callback should be used in favour of defining one or more `*Provider` beans, \
+                the support for which has now been deprecated. \
+                See [Spring Boot 2.5 jOOQ customization](https://docs.spring.io/spring-boot/docs/2.5.x/reference/htmlsingle/#features.sql.jooq.customizing).\
+                """;
     }
 
     @Override

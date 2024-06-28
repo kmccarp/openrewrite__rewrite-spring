@@ -66,7 +66,7 @@ public class MigrateHandlerInterceptor extends Recipe {
 
                     maybeAddImport("org.springframework.web.servlet.HandlerInterceptor");
                     doAfterVisit(new RemoveImport<>("org.springframework.web.servlet.handler.HandlerInterceptorAdapter", true));
-                    return autoFormat(cd, requireNonNull(cd.getImplements()).get(0), ctx, getCursor().getParentOrThrow());
+                    return autoFormat(cd, requireNonNull(cd.getImplements()).getFirst(), ctx, getCursor().getParentOrThrow());
                 }
                 return cd;
             }

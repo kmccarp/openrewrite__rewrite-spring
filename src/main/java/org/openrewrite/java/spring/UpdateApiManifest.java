@@ -58,7 +58,7 @@ public class UpdateApiManifest extends ScanningRecipe<UpdateApiManifest.ApiManif
             public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
                 if (tree instanceof JavaSourceFile) {
                     new SpringHttpEndpointCollector().visit(tree, acc.getApis());
-                } else if (tree instanceof PlainText && ((PlainText) tree).getSourcePath().equals(Paths.get("META-INF/api-manifest.txt"))) {
+                } else if (tree instanceof PlainText text && text.getSourcePath().equals(Paths.get("META-INF/api-manifest.txt"))) {
                     acc.setGenerate(false);
                 }
                 return tree;
@@ -96,11 +96,10 @@ public class UpdateApiManifest extends ScanningRecipe<UpdateApiManifest.ApiManif
     private String getArg(J.Annotation annotation, String key, String defaultValue) {
         if (annotation.getArguments() != null) {
             for (Expression argument : annotation.getArguments()) {
-                if (argument instanceof J.Literal) {
+                if (argument instanceof J.Literal literal) {
                     //noinspection ConstantConditions
-                    return (String) ((J.Literal) argument).getValue();
-                } else if (argument instanceof J.Assignment) {
-                    J.Assignment arg = (J.Assignment) argument;
+                    return (String) literal.getValue();
+                } else if (argument instanceof J.Assignment arg) {
                     if (((J.Identifier) arg.getVariable()).getSimpleName().equals(key)) {
                         if (arg.getAssignment() instanceof J.FieldAccess) {
                             return ((J.FieldAccess) arg.getAssignment()).getSimpleName();

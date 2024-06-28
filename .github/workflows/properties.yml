@@ -17,7 +17,7 @@ jobs:
         with:
           cache: 'gradle'
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       # Generate Spring Boot property migrations recipes
       - name: Create jar and copy dependencies

@@ -44,8 +44,10 @@ public class ReplaceExtendWithAndContextConfiguration extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Replaces `@ExtendWith(SpringRunner.class)` and `@ContextConfiguration` with `@SpringJunitConfig`, " +
-                "preserving attributes on `@ContextConfiguration`, unless `@ContextConfiguration(loader = ...)` is used.";
+        return """
+                Replaces `@ExtendWith(SpringRunner.class)` and `@ContextConfiguration` with `@SpringJunitConfig`, \
+                preserving attributes on `@ContextConfiguration`, unless `@ContextConfiguration(loader = ...)` is used.\
+                """;
     }
 
     @Override
@@ -100,8 +102,7 @@ public class ReplaceExtendWithAndContextConfiguration extends Recipe {
                     private void replaceValueArgumentWithLocations(J.Annotation a, List<Expression> newArgs) {
                         for (int i = 0; i < newArgs.size(); i++) {
                             Expression expression = newArgs.get(i);
-                            if (expression instanceof J.Assignment) {
-                                J.Assignment assignment = (J.Assignment) expression;
+                            if (expression instanceof J.Assignment assignment) {
                                 String name = ((J.Identifier) assignment.getVariable()).getSimpleName();
                                 if ("value".equals(name)) {
                                     J.Assignment as = createLocationsAssignment(a, assignment.getAssignment())
@@ -125,7 +126,7 @@ public class ReplaceExtendWithAndContextConfiguration extends Recipe {
                                     getCursor(),
                                     annotation.getCoordinates().replaceArguments(),
                                     value
-                                )).getArguments().get(0);
+                                )).getArguments().getFirst();
                     }
                 });
     }
@@ -135,9 +136,9 @@ public class ReplaceExtendWithAndContextConfiguration extends Recipe {
             return Optional.empty();
         }
         return annotation.getArguments().stream()
-                .filter(arg -> arg instanceof J.Assignment
-                        && ((J.Assignment) arg).getVariable() instanceof J.Identifier
-                        && "loader".equals(((J.Identifier) ((J.Assignment) arg).getVariable()).getSimpleName()))
+                .filter(arg -> arg instanceof J.Assignment a
+                        && a.getVariable() instanceof J.Identifier
+                        && "loader".equals(((J.Identifier) a.getVariable()).getSimpleName()))
                 .map(J.Assignment.class::cast)
                 .findFirst();
     }

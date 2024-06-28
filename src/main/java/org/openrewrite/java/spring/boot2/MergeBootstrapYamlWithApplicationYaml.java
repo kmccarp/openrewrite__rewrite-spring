@@ -58,9 +58,9 @@ public class MergeBootstrapYamlWithApplicationYaml extends ScanningRecipe<MergeB
                 }
                 SourceFile source = (SourceFile) tree;
                 Path sourcePath = source.getSourcePath();
-                if (acc.getBootstrapYaml() == null && source instanceof Yaml.Documents
+                if (acc.getBootstrapYaml() == null && source instanceof Yaml.Documents documents
                         && PathUtils.matchesGlob(sourcePath, "**/main/resources/bootstrap.yml")) {
-                    acc.setBootstrapYaml((Yaml.Documents) source);
+                    acc.setBootstrapYaml(documents);
                 } else if (acc.getApplicationYaml() == null
                         && PathUtils.matchesGlob(sourcePath, "**/main/resources/application.yml")) {
                     acc.setApplicationYaml((Yaml.Documents) source);
@@ -110,7 +110,7 @@ public class MergeBootstrapYamlWithApplicationYaml extends ScanningRecipe<MergeB
                     source = new CoalescePropertiesVisitor<Integer>().visitDocuments(a.withDocuments(ListUtils.map((List<Yaml.Document>) a.getDocuments(), doc -> {
                         if (merged.compareAndSet(false, true) && FindProperty.find(doc, "spring.config.activate.on-profile", true).isEmpty()) {
                             return (Yaml.Document) new MergeYamlVisitor<Integer>(doc.getBlock(), b.getDocuments()
-                                    .get(0).getBlock(), true, null).visit(doc, 0, new Cursor(new Cursor(null, a), doc));
+                                    .getFirst().getBlock(), true, null).visit(doc, 0, new Cursor(new Cursor(null, a), doc));
                         }
                         return doc;
                     })), 0);

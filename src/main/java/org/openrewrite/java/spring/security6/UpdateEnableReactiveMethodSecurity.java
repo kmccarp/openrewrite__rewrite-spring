@@ -42,8 +42,10 @@ public class UpdateEnableReactiveMethodSecurity extends Recipe {
 
     @Override
     public String getDescription() {
-        return "In Spring security 6.0, `@EnableReactiveMethodSecurity` defaults `useAuthorizationManager` to true. " +
-                "So, to complete migration, `@EnableReactiveMethodSecurity` remove the `useAuthorizationManager` attribute.";
+        return """
+                In Spring security 6.0, `@EnableReactiveMethodSecurity` defaults `useAuthorizationManager` to true. \
+                So, to complete migration, `@EnableReactiveMethodSecurity` remove the `useAuthorizationManager` attribute.\
+                """;
     }
 
     @Override
@@ -72,8 +74,7 @@ public class UpdateEnableReactiveMethodSecurity extends Recipe {
     }
 
     private static boolean isUseAuthorizationManagerArgSetToTrue(Expression arg) {
-        if (arg instanceof J.Assignment) {
-            J.Assignment assignment = (J.Assignment) arg;
+        if (arg instanceof J.Assignment assignment) {
             return assignment.getVariable().toString().equals("useAuthorizationManager") &&
                     RequireExplicitSavingOfSecurityContextRepository.isTrue(assignment.getAssignment());
         }

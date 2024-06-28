@@ -39,8 +39,10 @@ public class NoAutowiredOnConstructor extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Spring can infer an autowired constructor when there is a single constructor on the bean. " +
-                "This recipe removes unneeded `@Autowired` annotations on constructors.";
+        return """
+                Spring can infer an autowired constructor when there is a single constructor on the bean. \
+                This recipe removes unneeded `@Autowired` annotations on constructors.\
+                """;
     }
 
     @Override
@@ -84,6 +86,6 @@ public class NoAutowiredOnConstructor extends Recipe {
     }
 
     private static boolean isConstructor(Statement s) {
-        return s instanceof J.MethodDeclaration && ((J.MethodDeclaration) s).isConstructor();
+        return s instanceof J.MethodDeclaration md && md.isConstructor();
     }
 }

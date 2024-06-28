@@ -56,7 +56,7 @@ public class AutowiredFieldIntoConstructorParameterVisitor extends JavaVisitor<E
             if (constructors.isEmpty()) {
                 applicable = true;
             } else if (constructors.size() == 1) {
-                MethodDeclaration c = constructors.get(0);
+                MethodDeclaration c = constructors.getFirst();
                 getCursor().putMessage("applicableConstructor", c);
                 applicable = isNotConstructorInitializingField(c, fieldName);
             } else {
@@ -69,8 +69,8 @@ public class AutowiredFieldIntoConstructorParameterVisitor extends JavaVisitor<E
                         .limit(2)
                         .collect(Collectors.toList());
                 if (autowiredConstructors.size() == 1) {
-                    MethodDeclaration c = autowiredConstructors.get(0);
-                    getCursor().putMessage("applicableConstructor", autowiredConstructors.get(0));
+                    MethodDeclaration c = autowiredConstructors.getFirst();
+                    getCursor().putMessage("applicableConstructor", autowiredConstructors.getFirst());
                     applicable = isNotConstructorInitializingField(c, fieldName);
                 }
             }
@@ -85,8 +85,7 @@ public class AutowiredFieldIntoConstructorParameterVisitor extends JavaVisitor<E
     public static boolean isNotConstructorInitializingField(MethodDeclaration c, String fieldName) {
         return c.getBody() == null || c.getBody().getStatements().stream().filter(J.Assignment.class::isInstance).map(J.Assignment.class::cast).noneMatch(a -> {
             Expression expr = a.getVariable();
-            if (expr instanceof J.FieldAccess) {
-                J.FieldAccess fa = (J.FieldAccess) expr;
+            if (expr instanceof J.FieldAccess fa) {
                 if (fieldName.equals(fa.getSimpleName()) && fa.getTarget() instanceof J.Identifier) {
                     J.Identifier target = (J.Identifier) fa.getTarget();
                     if ("this".equals(target.getSimpleName())) {
@@ -94,10 +93,9 @@ public class AutowiredFieldIntoConstructorParameterVisitor extends JavaVisitor<E
                     }
                 }
             }
-            if (expr instanceof J.Identifier) {
+            if (expr instanceof J.Identifier identifier) {
                 JavaType.Variable fieldType = c.getMethodType().getDeclaringType().getMembers().stream().filter(v -> fieldName.equals(v.getName())).findFirst().orElse(null);
                 if (fieldType != null) {
-                    J.Identifier identifier = (J.Identifier) expr;
                     return fieldType.equals(identifier.getFieldType());
                 }
             }
@@ -114,7 +112,7 @@ public class AutowiredFieldIntoConstructorParameterVisitor extends JavaVisitor<E
         VariableDeclarations mv = multiVariable;
         if (blockCursor.getParent() != null && blockCursor.getParent().getValue() instanceof ClassDeclaration
                 && multiVariable.getVariables().size() == 1
-                && fieldName.equals(multiVariable.getVariables().get(0).getName().getSimpleName())) {
+                && fieldName.equals(multiVariable.getVariables().getFirst().getName().getSimpleName())) {
 
             mv = (VariableDeclarations) new RemoveAnnotationVisitor(new AnnotationMatcher("@" + AUTOWIRED)).visitNonNull(multiVariable, p);
             if (mv != multiVariable && multiVariable.getTypeExpression() != null) {
@@ -157,8 +155,7 @@ public class AutowiredFieldIntoConstructorParameterVisitor extends JavaVisitor<E
         public J visitBlock(Block block, ExecutionContext p) {
             if (getCursor().getParent() != null) {
                 Object n = getCursor().getParent().getValue();
-                if (n instanceof ClassDeclaration) {
-                    ClassDeclaration classDecl = (ClassDeclaration) n;
+                if (n instanceof ClassDeclaration classDecl) {
                     JavaType.FullyQualified typeFqn = TypeUtils.asFullyQualified(type.getType());
                     if (typeFqn != null && classDecl.getKind() == ClassDeclaration.Kind.Type.Class && className.equals(classDecl.getSimpleName())) {
                         JavaTemplate.Builder template = JavaTemplate.builder(""

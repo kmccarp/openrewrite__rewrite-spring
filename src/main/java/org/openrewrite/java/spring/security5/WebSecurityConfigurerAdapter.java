@@ -106,8 +106,7 @@ public class WebSecurityConfigurerAdapter extends Recipe {
                 boolean hasConflict = false;
                 if (isWebSecurityConfigurerAdapterClass) {
                     for (Statement s : classDecl.getBody().getStatements()) {
-                        if (s instanceof J.MethodDeclaration) {
-                            J.MethodDeclaration method = (J.MethodDeclaration) s;
+                        if (s instanceof J.MethodDeclaration method) {
                             if (isConflictingMethod(method)) {
                                 hasConflict = true;
                                 break;
@@ -210,8 +209,7 @@ public class WebSecurityConfigurerAdapter extends Recipe {
                     statements.addAll(classDecl.getBody().getStatements());
                     for (J.ClassDeclaration fc : toFlatten) {
                         for (Statement s : fc.getBody().getStatements()) {
-                            if (s instanceof J.MethodDeclaration) {
-                                J.MethodDeclaration m = (J.MethodDeclaration) s;
+                            if (s instanceof J.MethodDeclaration m) {
                                 if (isAnnotatedWith(m.getLeadingAnnotations(), FQN_BEAN) && m.getMethodType() != null) {
                                     JavaType.FullyQualified beanType = TypeUtils.asFullyQualified(m.getMethodType().getReturnType());
                                     if (beanType == null) {
@@ -360,21 +358,23 @@ public class WebSecurityConfigurerAdapter extends Recipe {
                 return JavaTemplate.builder("return #{any(org.springframework.security.config.annotation.SecurityBuilder)}.build();")
                     .contextSensitive()
                     .javaParser(JavaParser.fromJavaVersion()
-                        .dependsOn("package org.springframework.security.config.annotation;" +
-                                   "public interface SecurityBuilder<O> {\n" +
-                                   "    O build() throws Exception;" +
-                                   "}"))
+                        .dependsOn("""
+                                   package org.springframework.security.config.annotation;\
+                                   public interface SecurityBuilder<O> {
+                                       O build() throws Exception;\
+                                   }\
+                                   """))
                     .imports("org.springframework.security.config.annotation.SecurityBuilder")
                     .build()
                     .apply(
                         getCursor(),
                         b.getCoordinates().lastStatement(),
-                        ((J.VariableDeclarations) parentMethod.getParameters().get(0)).getVariables().get(0).getName()
+                        ((J.VariableDeclarations) parentMethod.getParameters().getFirst()).getVariables().getFirst().getName()
                     );
             }
 
             private J.Block handleWebSecurity(J.Block b, J.MethodDeclaration parentMethod) {
-                String t = "return (" + ((J.VariableDeclarations) parentMethod.getParameters().get(0)).getVariables().get(0).getName().getSimpleName() + ") -> #{any()};";
+                String t = "return (" + ((J.VariableDeclarations) parentMethod.getParameters().getFirst()).getVariables().getFirst().getName().getSimpleName() + ") -> #{any()};";
                 b = JavaTemplate.builder(t)
                     .contextSensitive()
                     .javaParser(JavaParser.fromJavaVersion())
@@ -426,22 +426,28 @@ public class WebSecurityConfigurerAdapter extends Recipe {
                         .contextSensitive()
                         .javaParser(JavaParser.fromJavaVersion()
                                 .dependsOn(
-                                        "package org.springframework.security.core.userdetails;\n" +
-                                                "public interface UserDetails {}\n",
+                                        """
+                                        package org.springframework.security.core.userdetails;
+                                        public interface UserDetails {}
+                                        """,
 
-                                        "package org.springframework.security.provisioning;\n" +
-                                                "public class InMemoryUserDetailsManager {\n" +
-                                                "    public InMemoryUserDetailsManager(org.springframework.security.core.userdetails.UserDetails user) {}\n" +
-                                                "}",
+                                        """
+package org.springframework.security.provisioning;
+public class InMemoryUserDetailsManager {
+    public InMemoryUserDetailsManager(org.springframework.security.core.userdetails.UserDetails user) {}
+}\
+""",
 
-                                        "package org.springframework.security.core.userdetails;\n" +
-                                                "public class User {\n" +
-                                                "   public static UserBuilder builder() {}\n" +
-                                                "   public interface UserBuilder {\n" +
-                                                "       UserBuilder username(String s);\n" +
-                                                "       UserDetails build();\n" +
-                                                "   }\n" +
-                                                "}\n"
+                                        """
+package org.springframework.security.core.userdetails;
+public class User {
+   public static UserBuilder builder() {}
+   public interface UserBuilder {
+       UserBuilder username(String s);
+       UserDetails build();
+   }
+}
+"""
                                 ))
                         .imports(FQN_INMEMORY_AUTH_MANAGER, FQN_USER_DETAILS_BUILDER, FQN_USER)
                         .build();
@@ -508,8 +514,8 @@ public class WebSecurityConfigurerAdapter extends Recipe {
             return AuthType.NONE;
         }
         Statement lastStatement = m.getBody().getStatements().get(m.getBody().getStatements().size() - 1);
-        if (lastStatement instanceof J.MethodInvocation) {
-            for (J.MethodInvocation invocation = (J.MethodInvocation) lastStatement; invocation != null; ) {
+        if (lastStatement instanceof J.MethodInvocation invocation) {
+            for (; invocation != null; ) {
                 Expression target = invocation.getSelect();
                 if (target != null) {
                     JavaType.FullyQualified type = TypeUtils.asFullyQualified(target.getType());
@@ -523,8 +529,8 @@ public class WebSecurityConfigurerAdapter extends Recipe {
                                 return AuthType.JDBC;
                         }
                     }
-                    if (target instanceof J.MethodInvocation) {
-                        invocation = (J.MethodInvocation) target;
+                    if (target instanceof J.MethodInvocation methodInvocation) {
+                        invocation = methodInvocation;
                         continue;
                     }
                 }
@@ -542,7 +548,7 @@ public class WebSecurityConfigurerAdapter extends Recipe {
             @Override
             public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, AtomicReference<Expression> ref) {
                 if (AUTH_INMEMORY_WITH_USER.matches(method)) {
-                    ref.set(method.getArguments().get(0));
+                    ref.set(method.getArguments().getFirst());
                     return method;
                 }
                 return super.visitMethodInvocation(method, ref);

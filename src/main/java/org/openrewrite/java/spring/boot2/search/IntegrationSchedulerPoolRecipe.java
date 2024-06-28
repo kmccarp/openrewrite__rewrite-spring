@@ -68,10 +68,12 @@ public class IntegrationSchedulerPoolRecipe extends ScanningRecipe<IntegrationSc
 
     @Override
     public String getDescription() {
-        return "Spring Integration now reuses an available `TaskScheduler` rather than configuring its own. In a" +
-                " typical application setup relying on the auto-configuration, this means that Spring Integration" +
-                " uses the auto-configured task scheduler that has a pool size of 1. To restore Spring Integration’s" +
-                " default of 10 threads, use the `spring.task.scheduling.pool.size` property.";
+        return """
+                Spring Integration now reuses an available `TaskScheduler` rather than configuring its own. In a\
+                 typical application setup relying on the auto-configuration, this means that Spring Integration\
+                 uses the auto-configured task scheduler that has a pool size of 1. To restore Spring Integration’s\
+                 default of 10 threads, use the `spring.task.scheduling.pool.size` property.\
+                """;
     }
 
     private boolean isApplicableMavenProject(Xml.Document maven) {
@@ -121,7 +123,7 @@ public class IntegrationSchedulerPoolRecipe extends ScanningRecipe<IntegrationSc
                 }
 
                 Optional<JavaProject> maybeJavaProject = tree.getMarkers().findFirst(JavaProject.class);
-                if (!maybeJavaProject.isPresent() || acc.getProcessedProjects().contains(maybeJavaProject.get())) {
+                if (maybeJavaProject.isEmpty() || acc.getProcessedProjects().contains(maybeJavaProject.get())) {
                     return tree;
                 }
 
@@ -129,24 +131,22 @@ public class IntegrationSchedulerPoolRecipe extends ScanningRecipe<IntegrationSc
                 String fileName = source.getSourcePath().getFileName().toString();
                 JavaProject javaProject = maybeJavaProject.get();
 
-                if (source instanceof Xml.Document) {
-                    Xml.Document xml = (Xml.Document) source;
+                if (source instanceof Xml.Document xml) {
                     Optional<MavenResolutionResult> maybeMavenMarker = source.getMarkers().findFirst(MavenResolutionResult.class);
                     if (maybeMavenMarker.isPresent() && isApplicableMavenProject(xml)) {
                         acc.getApplicableProjects().add(javaProject);
                     }
-                } else if (source instanceof Properties && APP_PROPS_FILE_REGEX.matcher(fileName).matches()) {
-                    if (!FindProperties.find((Properties) source, PROPERTY_KEY, false).isEmpty()) {
+                } else if (source instanceof Properties properties && APP_PROPS_FILE_REGEX.matcher(fileName).matches()) {
+                    if (!FindProperties.find(properties, PROPERTY_KEY, false).isEmpty()) {
                         acc.getSourceToCommentByProject().put(javaProject, source.getSourcePath());
                     }
-                } else if (source instanceof Yaml.Documents && APP_YAML_FILE_REGEX.matcher(fileName).matches()) {
-                    if (!FindProperty.find((Yaml) source, PROPERTY_KEY, false).isEmpty()) {
+                } else if (source instanceof Yaml.Documents documents && APP_YAML_FILE_REGEX.matcher(fileName).matches()) {
+                    if (!FindProperty.find(documents, PROPERTY_KEY, false).isEmpty()) {
                         acc.getSourceToCommentByProject().put(javaProject, source.getSourcePath());
                     }
-                } else if (source instanceof JavaSourceFile && acc.getSourceToCommentByProject().get(javaProject) == null) {
-                    JavaSourceFile javaSourceFile = (JavaSourceFile) source;
+                } else if (source instanceof JavaSourceFile javaSourceFile && acc.getSourceToCommentByProject().get(javaProject) == null) {
                     if (javaSourceFile.getTypesInUse().getTypesInUse().stream().anyMatch(t -> t instanceof
-                            JavaType.Class && ((JavaType.Class) t).getFullyQualifiedName().equals(SPRING_BOOT_APPLICATION))) {
+                            JavaType.Class c && c.getFullyQualifiedName().equals(SPRING_BOOT_APPLICATION))) {
                         new JavaIsoVisitor<Integer>() {
                             final AnnotationMatcher annotationMatcher = new AnnotationMatcher('@' + SPRING_BOOT_APPLICATION);
 
@@ -184,8 +184,8 @@ public class IntegrationSchedulerPoolRecipe extends ScanningRecipe<IntegrationSc
                 }
 
                 SourceFile source = (SourceFile) tree;
-                if (source instanceof Properties) {
-                    Set<Properties.Entry> foundEntries = FindProperties.find((Properties) source, PROPERTY_KEY, false);
+                if (source instanceof Properties properties) {
+                    Set<Properties.Entry> foundEntries = FindProperties.find(properties, PROPERTY_KEY, false);
                     if (!foundEntries.isEmpty()) {
                         // There should only be one exact match!
                         Properties.Entry entry = foundEntries.iterator().next();
@@ -203,8 +203,8 @@ public class IntegrationSchedulerPoolRecipe extends ScanningRecipe<IntegrationSc
                         }.visitNonNull(source, ctx);
                         source = source.withMarkers(source.getMarkers().addIfAbsent(new CommentAdded(Tree.randomId())));
                     }
-                } else if (source instanceof Yaml) {
-                    Set<Yaml.Block> foundEntriesValues = FindProperty.find((Yaml) source, PROPERTY_KEY, false);
+                } else if (source instanceof Yaml yaml) {
+                    Set<Yaml.Block> foundEntriesValues = FindProperty.find(yaml, PROPERTY_KEY, false);
                     if (!foundEntriesValues.isEmpty()) {
                         source = (SourceFile) new YamlIsoVisitor<ExecutionContext>() {
                             @Override

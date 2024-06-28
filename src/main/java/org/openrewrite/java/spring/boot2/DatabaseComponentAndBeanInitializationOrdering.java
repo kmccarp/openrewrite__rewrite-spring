@@ -42,12 +42,14 @@ public class DatabaseComponentAndBeanInitializationOrdering extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Beans of certain well-known types, such as `JdbcTemplate`, will be ordered so that they are initialized " +
-                "after the database has been initialized. If you have a bean that works with the `DataSource` directly, " +
-                "annotate its class or `@Bean` method with `@DependsOnDatabaseInitialization` to ensure that it too is " +
-                "initialized after the database has been initialized. See the " +
-                "[release notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.5-Release-Notes#initialization-ordering) " +
-                "for more.";
+        return """
+                Beans of certain well-known types, such as `JdbcTemplate`, will be ordered so that they are initialized \
+                after the database has been initialized. If you have a bean that works with the `DataSource` directly, \
+                annotate its class or `@Bean` method with `@DependsOnDatabaseInitialization` to ensure that it too is \
+                initialized after the database has been initialized. See the \
+                [release notes](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.5-Release-Notes#initialization-ordering) \
+                for more.\
+                """;
     }
 
     @Override
@@ -151,8 +153,7 @@ public class DatabaseComponentAndBeanInitializationOrdering extends Recipe {
                 if (isWellKnownDataSourceInitializationType(type)) {
                     return false;
                 }
-                if (type instanceof JavaType.FullyQualified) {
-                    JavaType.FullyQualified fq = (JavaType.FullyQualified) type;
+                if (type instanceof JavaType.FullyQualified fq) {
                     // type fields
                     for (JavaType.Variable var : fq.getMembers()) {
                         if (isDataSourceType(var.getType())) {

@@ -43,8 +43,10 @@ public class FindSpringComponents extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Find Spring components, including controllers, services, repositories, " +
-               "return types of `@Bean` annotated methods, etc.";
+        return """
+               Find Spring components, including controllers, services, repositories, \
+               return types of `@Bean` annotated methods, etc.\
+               """;
     }
 
     @Override
@@ -83,8 +85,7 @@ public class FindSpringComponents extends Recipe {
                 int ctorCount = 0;
                 J.MethodDeclaration ctor = null;
                 for (Statement statement : c.getBody().getStatements()) {
-                    if (statement instanceof J.MethodDeclaration) {
-                        J.MethodDeclaration m = (J.MethodDeclaration) statement;
+                    if (statement instanceof J.MethodDeclaration m) {
                         if (m.isConstructor()) {
                             boolean autowired = !FindAnnotations.find(m, "@org.springframework.beans.factory.annotation.Autowired").isEmpty();
                             if (autowired || m.hasModifier(J.Modifier.Type.Public)) {
@@ -110,8 +111,8 @@ public class FindSpringComponents extends Recipe {
                     return;
                 }
                 for (Statement dependency : m.getParameters()) {
-                    if (dependency instanceof J.VariableDeclarations) {
-                        JavaType.FullyQualified depType = ((J.VariableDeclarations) dependency).getTypeAsFullyQualified();
+                    if (dependency instanceof J.VariableDeclarations declarations) {
+                        JavaType.FullyQualified depType = declarations.getTypeAsFullyQualified();
                         if (depType != null) {
                             componentRelationships.insertRow(ctx, new SpringComponentRelationships.Row(
                                     getCursor().firstEnclosingOrThrow(SourceFile.class).getSourcePath().toString(),

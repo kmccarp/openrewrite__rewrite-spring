@@ -39,8 +39,10 @@ public class RestTemplateBuilderRequestFactory extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Migrate `RestTemplateBuilder#requestFactory` calls to use a `Supplier`. " +
-                "See the [migration guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#resttemplatebuilder) for more.";
+        return """
+                Migrate `RestTemplateBuilder#requestFactory` calls to use a `Supplier`. \
+                See the [migration guide](https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-2.0-Migration-Guide#resttemplatebuilder) for more.\
+                """;
     }
 
     @Override
@@ -57,14 +59,14 @@ public class RestTemplateBuilderRequestFactory extends Recipe {
             // TODO JavaTemplate doesn't replace method type attribution when replacing arguments.
             boolean isArgumentClientHttpRequestFactory = method.getArguments().size() == 1 &&
                     TypeUtils.isAssignableTo(JavaType.ShallowClass.build("org.springframework.http.client.ClientHttpRequestFactory"),
-                            method.getArguments().get(0).getType());
+                            method.getArguments().getFirst().getType());
 
             if (REQUEST_FACTORY.matches(method) && isArgumentClientHttpRequestFactory) {
                 JavaTemplate.Builder t = JavaTemplate.builder("() -> #{any(org.springframework.http.client.ClientHttpRequestFactory)}")
                         .contextSensitive()
                         .javaParser(JavaParser.fromJavaVersion()
                                 .classpathFromResources(ctx, "spring-boot-2.*"));
-                m = t.build().apply(getCursor(), m.getCoordinates().replaceArguments(), m.getArguments().get(0));
+                m = t.build().apply(getCursor(), m.getCoordinates().replaceArguments(), m.getArguments().getFirst());
             }
             return m;
         }

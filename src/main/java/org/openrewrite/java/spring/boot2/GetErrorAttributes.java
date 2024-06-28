@@ -55,11 +55,11 @@ public class GetErrorAttributes extends Recipe {
         };
 
         private static boolean isLiteralTrue(@Nullable Expression expression) {
-            return expression instanceof J.Literal && ((J.Literal) expression).getValue() == Boolean.valueOf(true);
+            return expression instanceof J.Literal l && l.getValue() == Boolean.valueOf(true);
         }
 
         private static boolean isLiteralFalse(@Nullable Expression expression) {
-            return expression instanceof J.Literal && ((J.Literal) expression).getValue() == Boolean.valueOf(false);
+            return expression instanceof J.Literal l && l.getValue() == Boolean.valueOf(false);
         }
 
         @Override
@@ -78,7 +78,7 @@ public class GetErrorAttributes extends Recipe {
                         .build().apply(
                             getCursor(),
                             mi.getCoordinates().replaceArguments(),
-                            mi.getArguments().get(0)
+                            mi.getArguments().getFirst()
                     );
                 } else if (isLiteralFalse(includeStackTraceArgument)) {
                     String template = "#{any(org.springframework.web.context.request.WebRequest)}, ErrorAttributeOptions.defaults()";
@@ -91,7 +91,7 @@ public class GetErrorAttributes extends Recipe {
                         .apply(
                             getCursor(),
                             mi.getCoordinates().replaceArguments(),
-                            mi.getArguments().get(0)
+                            mi.getArguments().getFirst()
                     );
                 } else if (!(mi.getArguments().get(1) instanceof J.Ternary)) {
                     String template = "#{any(org.springframework.web.context.request.WebRequest)}, #{any(boolean)} ? ErrorAttributeOptions.defaults().including(ErrorAttributeOptions.Include.STACK_TRACE) : ErrorAttributeOptions.defaults()";

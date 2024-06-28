@@ -36,8 +36,10 @@ public class MigrateWebMvcConfigurerAdapter extends Recipe {
 
     @Override
     public String getDescription() {
-        return "As of 5.0 `WebMvcConfigurer` has default methods (made possible by a Java 8 baseline) and can be " +
-               "implemented directly without the need for this adapter.";
+        return """
+               As of 5.0 `WebMvcConfigurer` has default methods (made possible by a Java 8 baseline) and can be \
+               implemented directly without the need for this adapter.\
+               """;
     }
 
     @Override

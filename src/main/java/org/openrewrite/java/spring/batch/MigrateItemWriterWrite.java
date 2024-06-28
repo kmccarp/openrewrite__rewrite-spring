@@ -57,13 +57,13 @@ public class MigrateItemWriterWrite extends Recipe {
                     return m;
                 }
 
-                J.VariableDeclarations parameter = (J.VariableDeclarations) m.getParameters().get(0);
+                J.VariableDeclarations parameter = (J.VariableDeclarations) m.getParameters().getFirst();
                 if (!(parameter.getTypeExpression() instanceof J.ParameterizedType)
                     || ((J.ParameterizedType) parameter.getTypeExpression()).getTypeParameters() == null) {
                     return m;
                 }
-                String chunkTypeParameter = ((J.ParameterizedType) parameter.getTypeExpression()).getTypeParameters().get(0).toString();
-                String paramName = parameter.getVariables().get(0).getSimpleName();
+                String chunkTypeParameter = ((J.ParameterizedType) parameter.getTypeExpression()).getTypeParameters().getFirst().toString();
+                String paramName = parameter.getVariables().getFirst().getSimpleName();
 
                 // @Override may or may not already be present
                 String annotationsWithOverride = Stream.concat(
@@ -134,7 +134,7 @@ public class MigrateItemWriterWrite extends Recipe {
                     if (isParameter(e)) {
                         JavaType type = parameterTypes.size() > i ?
                                 parameterTypes.get(i) :
-                                parameterTypes.get(parameterTypes.size() - 1);
+                                parameterTypes.getLast();
 
                         if (notAssignableFromChunk(type)) {
                             return newGetItemsMethodInvocation(
@@ -181,9 +181,9 @@ public class MigrateItemWriterWrite extends Recipe {
         }
 
         private boolean isParameter(@Nullable Expression maybeParameter) {
-            return maybeParameter instanceof J.Identifier &&
-                   ((J.Identifier) maybeParameter).getFieldType() != null &&
-                   ((J.Identifier) maybeParameter).getFieldType().getName().equals(parameterName);
+            return maybeParameter instanceof J.Identifier i &&
+                   i.getFieldType() != null &&
+                   i.getFieldType().getName().equals(parameterName);
         }
 
         private static J.MethodInvocation newGetItemsMethodInvocation(JRightPadded<Expression> select) {

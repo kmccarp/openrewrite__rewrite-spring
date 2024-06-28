@@ -57,9 +57,11 @@ public class ConfigurationOverEnableSecurity extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Prior to Spring Security 6, `@EnableXXXSecurity` implicitly had `@Configuration`. " +
-                "`Configuration` was removed from the definitions of the `@EnableSecurity` definitions in Spring Security 6. " +
-                "Consequently classes annotated with `@EnableXXXSecurity` coming from pre-Boot 3 should have `@Configuration` annotation added.";
+        return """
+                Prior to Spring Security 6, `@EnableXXXSecurity` implicitly had `@Configuration`. \
+                `Configuration` was removed from the definitions of the `@EnableSecurity` definitions in Spring Security 6. \
+                Consequently classes annotated with `@EnableXXXSecurity` coming from pre-Boot 3 should have `@Configuration` annotation added.\
+                """;
     }
 
     private JavaVisitor<ExecutionContext> precondition() {
@@ -67,8 +69,8 @@ public class ConfigurationOverEnableSecurity extends Recipe {
             @Override
             public J preVisit(J tree, ExecutionContext ctx) {
                 stopAfterPreVisit();
-                if (tree instanceof JavaSourceFile) {
-                    for (JavaType type : ((JavaSourceFile) tree).getTypesInUse().getTypesInUse()) {
+                if (tree instanceof JavaSourceFile file) {
+                    for (JavaType type : file.getTypesInUse().getTypesInUse()) {
                         if (SECURITY_ANNOTATION_MATCHER.matchesAnnotationOrMetaAnnotation(TypeUtils.asFullyQualified(type))) {
                             return SearchResult.found(tree);
                         }

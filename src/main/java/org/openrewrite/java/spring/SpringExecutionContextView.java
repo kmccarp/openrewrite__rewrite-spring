@@ -31,8 +31,8 @@ public class SpringExecutionContextView extends DelegatingExecutionContext {
     }
 
     public static SpringExecutionContextView view(ExecutionContext ctx) {
-        if (ctx instanceof SpringExecutionContextView) {
-            return (SpringExecutionContextView) ctx;
+        if (ctx instanceof SpringExecutionContextView view) {
+            return view;
         }
         return new SpringExecutionContextView(ctx);
     }
